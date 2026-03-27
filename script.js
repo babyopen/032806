@@ -1921,7 +1921,7 @@ const Business = {
         ballHtml += `
           <div class="ball-item">
             <div class="ball ${color}">${numStr}</div>
-            <div class="ball-zodiac">${zodiac}·${element}</div>
+            <div class="ball-zodiac">${zodiac}/${element}</div>
           </div>
         `;
       });
@@ -2347,16 +2347,28 @@ const Business = {
       return 'red';
     };
 
-    // 渲染成带颜色和生肖的球号
+    // 获取号码的五行
+    const getNumElement = (num) => {
+      if(CONFIG.ELEMENT_MAP['金'].includes(num)) return '金';
+      if(CONFIG.ELEMENT_MAP['木'].includes(num)) return '木';
+      if(CONFIG.ELEMENT_MAP['水'].includes(num)) return '水';
+      if(CONFIG.ELEMENT_MAP['火'].includes(num)) return '火';
+      if(CONFIG.ELEMENT_MAP['土'].includes(num)) return '土';
+      return '';
+    };
+
+    // 渲染成带颜色、生肖和五行的球号
     let ballHtml = '<div class="ball-group">';
     finalNums.forEach(num => {
       const color = getNumColor(num);
       const zodiac = fullNumZodiacMap.get(num) || '';
+      const element = getNumElement(num);
       const numStr = String(num).padStart(2, '0');
+      const zodiacText = element ? `${zodiac}/${element}` : zodiac;
       ballHtml += `
         <div class="ball-item">
           <div class="ball ${color}">${numStr}</div>
-          <div class="ball-zodiac">${zodiac}</div>
+          <div class="ball-zodiac">${zodiacText}</div>
         </div>
       `;
     });

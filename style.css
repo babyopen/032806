@@ -701,26 +701,26 @@ html, body {
 /* 精选特码和热门特码专用紧凑样式 */
 .final-recommend-z .ball-group,
 .analysis-item-full .ball-group {
-  gap: clamp(2px, 1vw, 6px);
-  margin: 6px 0;
+  gap: clamp(4px, 2vw, 10px);
+  margin: 8px 0;
 }
 
 .final-recommend-z .ball,
 .analysis-item-full .ball {
-  width: clamp(18px, 5vw, 26px);
-  height: clamp(18px, 5vw, 26px);
-  font-size: clamp(9px, 2.5vw, 12px);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  width: clamp(24px, 7vw, 34px);
+  height: clamp(24px, 7vw, 34px);
+  font-size: clamp(11px, 3vw, 15px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 .final-recommend-z .ball-item,
 .analysis-item-full .ball-item {
-  gap: clamp(1px, 0.3vw, 3px);
+  gap: clamp(2px, 0.8vw, 5px);
 }
 
 .final-recommend-z .ball-zodiac,
 .analysis-item-full .ball-zodiac {
-  font-size: clamp(6px, 1.8vw, 9px);
+  font-size: clamp(8px, 2.2vw, 11px);
   font-weight: 500;
 }
 
@@ -773,7 +773,7 @@ html, body {
 
 .zodiac-prediction-details {
   font-size: 10px;
-  color: var(--sub-text);
+  color: var(--text);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
