@@ -726,6 +726,90 @@ html, body {
   font-weight: 500;
 }
 
+/* 生肖预测模块 */
+.zodiac-prediction {
+  margin-bottom: 16px;
+}
+
+.zodiac-prediction-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.zodiac-prediction-item {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.zodiac-prediction-item.top-1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #000;
+}
+
+.zodiac-prediction-item.top-2 {
+  background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+  color: #000;
+}
+
+.zodiac-prediction-item.top-3 {
+  background: linear-gradient(135deg, #CD7F32, #8B4513);
+  color: #fff;
+}
+
+.zodiac-prediction-zodiac {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.zodiac-prediction-score {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.zodiac-prediction-details {
+  font-size: 10px;
+  color: var(--sub-text);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.zodiac-prediction-tag {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  background: rgba(0,0,0,0.1);
+}
+
+.zodiac-prediction-item.top-1 .zodiac-prediction-tag,
+.zodiac-prediction-item.top-2 .zodiac-prediction-tag,
+.zodiac-prediction-item.top-3 .zodiac-prediction-tag {
+  background: rgba(255,255,255,0.3);
+}
+
+@media (max-width: 375px) {
+  .zodiac-prediction-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  
+  .zodiac-prediction-zodiac {
+    font-size: 16px;
+  }
+  
+  .zodiac-prediction-score {
+    font-size: 12px;
+  }
+}
+
 /* 分析标签栏 */
 .analysis-tab-bar {
   display: flex;

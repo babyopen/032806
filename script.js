@@ -2058,7 +2058,115 @@ const Business = {
       t, sum: Object.values(tailZodMap[t]).reduce((a, b) => a + b, 0)
     })).sort((a, b) => b.sum - a.sum);
 
-    return { list, total, avgExpect, zodCount, zodMiss, zodAvgMiss, tailZodMap, followMap, topZod, topTail };
+    // ========== 生肖预测算法 ==========
+    const zodiacScores = {};
+    const zodiacDetails = {};
+
+    // 1. 热号状态分析 (0-20分)
+    const hotZodiacs = topZod.slice(0, 3).map(z => z[0]);
+    
+    // 2. 冷号状态分析 (0-30分) - 需要更长历史数据
+    let maxMiss = 0;
+    Object.values(zodMiss).forEach(m => { if(m > maxMiss) maxMiss = m; });
+
+    // 3. 间隔规律分析
+    const zodiacOrder = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+    const intervalStats = {};
+    for(let i = 0; i < 12; i++) intervalStats[i] = 0;
+    
+    for(let i = 1; i < list.length && i < 30; i++) {
+      const preZod = Business.getSpecial(list[i-1]).zod;
+      const curZod = Business.getSpecial(list[i]).zod;
+      const preIdx = zodiacOrder.indexOf(preZod);
+      const curIdx = zodiacOrder.indexOf(curZod);
+      if(preIdx !== -1 && curIdx !== -1) {
+        let diff = curIdx - preIdx;
+        if(diff > 6) diff -= 12;
+        if(diff < -6) diff += 12;
+        intervalStats[diff + 6]++;
+      }
+    }
+    const commonIntervals = Object.entries(intervalStats).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => parseInt(x[0]) - 6);
+
+    // 4. 上期生肖用于形态匹配
+    const lastZod = list.length > 0 ? Business.getSpecial(list[0]).zod : '';
+    
+    // 五行相生关系
+    const elementGenerate = {
+      '金': ['水'],
+      '水': ['木'],
+      '木': ['火'],
+      '火': ['土'],
+      '土': ['金']
+    };
+
+    // 生肖五行映射
+    const zodiacElement = {
+      '鼠': '水', '牛': '土', '虎': '木', '兔': '木',
+      '龙': '土', '蛇': '火', '马': '火', '羊': '土',
+      '猴': '金', '鸡': '金', '狗': '土', '猪': '水'
+    };
+
+    // 计算每个生肖的综合分数
+    CONFIG.ANALYSIS.ZODIAC_ALL.forEach(zod => {
+      let score = 0;
+      const details = { cold: 0, hot: 0, shape: 0, interval: 0 };
+
+      // 冷号状态 (0-30分)
+      const missValue = zodMiss[zod] || 0;
+      if(maxMiss > 0 && missValue >= maxMiss * 0.8) {
+        details.cold = 30;
+        score += 30;
+      } else if(missValue >= 24) {
+        details.cold = 20;
+        score += 20;
+      } else if(missValue >= 12) {
+        details.cold = 10;
+        score += 10;
+      }
+
+      // 热号状态 (0-20分)
+      if(hotZodiacs.includes(zod)) {
+        details.hot = 20;
+        score += 20;
+      }
+
+      // 形态匹配 (0-30分) - 五行相生
+      if(lastZod && zodiacElement[lastZod] && zodiacElement[zod]) {
+        const lastElement = zodiacElement[lastZod];
+        const currentElement = zodiacElement[zod];
+        if(elementGenerate[lastElement] && elementGenerate[lastElement].includes(currentElement)) {
+          details.shape = 15;
+          score += 15;
+        }
+      }
+
+      // 间隔匹配 (0-20分)
+      if(lastZod) {
+        const lastIdx = zodiacOrder.indexOf(lastZod);
+        const currentIdx = zodiacOrder.indexOf(zod);
+        if(lastIdx !== -1 && currentIdx !== -1) {
+          let diff = currentIdx - lastIdx;
+          if(diff > 6) diff -= 12;
+          if(diff < -6) diff += 12;
+          if(commonIntervals.includes(diff)) {
+            details.interval = 20;
+            score += 20;
+          }
+        }
+      }
+
+      zodiacScores[zod] = score;
+      zodiacDetails[zod] = details;
+    });
+
+    // 按分数排序
+    const sortedZodiacs = Object.entries(zodiacScores).sort((a, b) => b[1] - a[1]);
+
+    return { 
+      list, total, avgExpect, zodCount, zodMiss, zodAvgMiss, tailZodMap, followMap, topZod, topTail,
+      zodiacScores, zodiacDetails, sortedZodiacs
+    };
   },
 
   /**
@@ -2077,6 +2185,36 @@ const Business = {
     
     if(zodiacEmptyTip) zodiacEmptyTip.style.display = 'none';
     if(zodiacContent) zodiacContent.style.display = 'block';
+
+    // 生肖预测
+    const zodiacPredictionGrid = document.getElementById('zodiacPredictionGrid');
+    if(zodiacPredictionGrid && data.sortedZodiacs) {
+      let predictionHtml = '';
+      data.sortedZodiacs.forEach(([zod, score], idx) => {
+        const details = data.zodiacDetails[zod];
+        let topClass = '';
+        if(idx === 0) topClass = 'top-1';
+        else if(idx === 1) topClass = 'top-2';
+        else if(idx === 2) topClass = 'top-3';
+
+        const tags = [];
+        if(details.cold > 0) tags.push(`冷${details.cold}`);
+        if(details.hot > 0) tags.push(`热${details.hot}`);
+        if(details.shape > 0) tags.push(`形${details.shape}`);
+        if(details.interval > 0) tags.push(`间${details.interval}`);
+
+        predictionHtml += `
+          <div class="zodiac-prediction-item ${topClass}">
+            <div class="zodiac-prediction-zodiac">${zod}</div>
+            <div class="zodiac-prediction-score">${score}分</div>
+            <div class="zodiac-prediction-details">
+              ${tags.map(t => `<span class="zodiac-prediction-tag">${t}</span>`).join('')}
+            </div>
+          </div>
+        `;
+      });
+      zodiacPredictionGrid.innerHTML = predictionHtml;
+    }
 
     // 共振组合
     const combo1 = document.getElementById('combo1');
