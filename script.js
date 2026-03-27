@@ -2298,10 +2298,10 @@ const Business = {
       if(zod) fullNumZodiacMap.set(num, zod);
     }
 
-    // 锁定核心生肖池
-    const coreZodiacs = data.topZod.slice(0, 2).map(i => i[0]);
-    const missZodiac = Object.entries(data.zodMiss).sort((a, b) => b[1] - a[1]).slice(0, 1).map(i => i[0]);
-    if(missZodiac.length && !coreZodiacs.includes(missZodiac[0])) coreZodiacs.push(missZodiac[0]);
+    // 锁定核心生肖池：使用生肖预测高分的前4个生肖
+    const coreZodiacs = data.sortedZodiacs 
+      ? data.sortedZodiacs.slice(0, 4).map(i => i[0])
+      : data.topZod.slice(0, 2).map(i => i[0]);
 
     // 锁定热门尾数TOP3
     const hotTails = data.topTail.slice(0, 3).map(i => i.t);
@@ -2314,9 +2314,11 @@ const Business = {
       if(coreZodiacs.includes(zod) && hotTails.includes(tail)) {
         const miss = data.zodMiss[zod] || 0;
         const count = data.zodCount[zod] || 0;
+        // 获取生肖预测分数作为额外权重
+        const zodScore = data.zodiacScores && data.zodiacScores[zod] ? data.zodiacScores[zod] : 0;
         candidateNums.push({
           num,
-          weight: count * 10 + (10 - miss)
+          weight: count * 10 + (10 - miss) + zodScore * 2
         });
       }
     }

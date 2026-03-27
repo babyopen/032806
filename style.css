@@ -652,10 +652,8 @@ html, body {
   justify-content: center;
   gap: clamp(4px, 2vw, 12px);
   margin: 16px 0;
-  flex-wrap: nowrap;
-  overflow-x: auto;
+  flex-wrap: wrap;
   padding: 4px 2px;
-  -webkit-overflow-scrolling: touch;
 }
 
 .ball-item {
@@ -733,7 +731,7 @@ html, body {
 
 .zodiac-prediction-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   margin-top: 12px;
 }
@@ -795,9 +793,9 @@ html, body {
   background: rgba(255,255,255,0.3);
 }
 
-@media (max-width: 375px) {
+@media (max-width: 480px) {
   .zodiac-prediction-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 6px;
   }
   
@@ -807,6 +805,30 @@ html, body {
   
   .zodiac-prediction-score {
     font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .zodiac-prediction-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  
+  .zodiac-prediction-item {
+    padding: 8px 4px;
+  }
+  
+  .zodiac-prediction-zodiac {
+    font-size: 14px;
+  }
+  
+  .zodiac-prediction-score {
+    font-size: 11px;
+  }
+  
+  .zodiac-prediction-tag {
+    font-size: 8px;
+    padding: 1px 4px;
   }
 }
 
