@@ -2608,9 +2608,12 @@ const Business = {
    * @param {string} targetId - 模块ID
    */
   scrollToModule: (targetId) => {
+    console.log('scrollToModule called with targetId:', targetId);
     const targetEl = document.getElementById(targetId);
+    console.log('targetEl:', targetEl);
     if(targetEl){
       const offset = CONFIG.TOP_OFFSET + Utils.getSafeTop();
+      console.log('offset:', offset, 'targetEl.offsetTop:', targetEl.offsetTop);
       window.scrollTo({top: targetEl.offsetTop - offset, behavior: 'smooth'});
     }
     Business.toggleQuickNav(false);
@@ -2648,12 +2651,15 @@ const Business = {
    * 滚动事件处理（已节流优化）
    */
   handleScroll: Utils.throttle(() => {
+    console.log('handleScroll called');
     const state = StateManager._state;
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    console.log('scrollTop:', scrollTop, 'threshold:', CONFIG.BACK_TOP_THRESHOLD);
     clearTimeout(state.scrollTimer);
 
     // 显示/隐藏返回顶部按钮
     if(scrollTop > CONFIG.BACK_TOP_THRESHOLD){
+      console.log('Showing back to top button');
       DOM.backTopBtn.classList.add('show');
       // 滚动停止后延迟隐藏
       state.scrollTimer = setTimeout(() => {
@@ -2753,6 +2759,7 @@ const EventBinder = {
    */
   handleGlobalClick: (e) => {
     const target = e.target;
+    console.log('handleGlobalClick called, target:', target.className);
 
     // 1. 筛选标签点击
     const tag = target.closest('.tag[data-group]');
@@ -2772,8 +2779,10 @@ const EventBinder = {
 
     // 3. 快捷导航跳转
     const navTab = target.closest('.nav-tab[data-target]');
+    console.log('navTab:', navTab);
     if(navTab){
       const targetId = navTab.dataset.target;
+      console.log('Navigating to:', targetId);
       Business.scrollToModule(targetId);
       return;
     }
