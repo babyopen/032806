@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.03.05.1
+  小摇筛选 v26.03.05
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.03.05.1</title>
+<title>小摇筛选 v26.03.05</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -152,32 +152,11 @@ body{
   padding:0 16px;
 }
 .card{
-  background:rgba(255,255,255,0.2);
-  -webkit-backdrop-filter:blur(16px);
-  backdrop-filter:blur(16px);
+  background:var(--card);
   border-radius:var(--radius);
   margin-bottom:12px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.1),0 0 0 0.5px rgba(255,255,255,0.2) inset;
+  box-shadow:var(--shadow);
   overflow:hidden;
-  transition:transform 0.2s ease,box-shadow 0.2s,background 0.2s;
-  border:1px solid rgba(255,255,255,0.3);
-}
-@media (prefers-color-scheme: dark) {
-  .card{
-    background:rgba(30,30,30,0.2);
-    border:1px solid rgba(255,255,255,0.2);
-    box-shadow:0 8px 32px rgba(0,0,0,0.2),0 0 0 0.5px rgba(255,255,255,0.1) inset;
-  }
-}
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 16px 40px rgba(0,0,0,0.2);
-  background:rgba(255,255,255,0.25);
-}
-@media (prefers-color-scheme: dark) {
-  .card:hover{
-    background:rgba(30,30,30,0.25);
-  }
 }
 .card-header{
   display:flex;
@@ -376,11 +355,33 @@ body{
   user-select:none;
   color:var(--text);
   border:1px solid rgba(255,255,255,0.4);
+  overflow:hidden;
 }
+.quick-nav-btn::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+               rgba(255,255,255,0.6) 0%,
+               transparent 70%);
+  opacity:0;
+  transition:opacity 0.2s;
+  pointer-events:none;
+  border-radius:inherit;
+}
+.quick-nav-btn:hover::before{opacity:1}
 @media (prefers-color-scheme: dark) {
   .quick-nav-btn{
     background:rgba(30,30,30,0.2);
     border:1px solid rgba(255,255,255,0.4);
+  }
+  .quick-nav-btn::before{
+    background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+                 rgba(255,255,255,0.4) 0%,
+                 transparent 70%);
   }
 }
 .quick-nav-btn:hover{
@@ -507,12 +508,34 @@ body{
   border:1px solid rgba(255,255,255,0.4);
   width:auto;
   min-width:200px;
+  overflow:hidden;
   transition:all 0.3s ease;
 }
+.bottom-nav::before{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+               rgba(255,255,255,0.6) 0%,
+               transparent 70%);
+  opacity:0;
+  transition:opacity 0.2s;
+  pointer-events:none;
+  border-radius:inherit;
+}
+.bottom-nav:hover::before{opacity:1}
 @media (prefers-color-scheme: dark) {
   .bottom-nav{
     background:rgba(30,30,30,0.2);
     border:1px solid rgba(255,255,255,0.4);
+  }
+  .bottom-nav::before{
+    background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+                 rgba(255,255,255,0.4) 0%,
+                 transparent 70%);
   }
 }
 .bottom-nav:hover{
@@ -596,43 +619,6 @@ input[type="checkbox"]{
 @media (orientation: landscape) {
   .quick-nav-menu{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
   .back-top-btn{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
-}
-
-/* 可访问性适配 - 降低透明度 */
-@media (prefers-reduced-transparency: reduce) {
-  .card, .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-  .card {
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    box-shadow: var(--shadow) !important;
-  }
-  .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
-    background: var(--bg-secondary) !important;
-    border: none !important;
-  }
-  .btn-line {
-    background: var(--primary) !important;
-  }
-  .tag.active {
-    background: var(--primary) !important;
-  }
-  .btn-mini.red, .exclude-tag.excluded {
-    background: rgba(255,59,48,0.1) !important;
-  }
-  .quick-nav-btn.active {
-    background: rgba(255,107,53,0.9) !important;
-  }
-}
-
-/* 可访问性适配 - 降低动态效果 */
-@media (prefers-reduced-motion: reduce) {
-  .card, .quick-nav-btn, .bottom-nav {
-    transition: none !important;
-    transform: none !important;
-  }
 }
 
 /* 机选页面样式 */
@@ -1504,7 +1490,7 @@ input[type="checkbox"]{
   <div class="top-card">
     <div class="top-title">
       <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-      <span>v26.03.05.1</span>
+      <span>v26.03.05</span>
     </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -1820,7 +1806,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.03.05.1</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：v26.03.05</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -5829,7 +5815,36 @@ const EventBinder = {
     // 全局错误捕获
     window.addEventListener('error', EventBinder.handleGlobalError);
     
-    // 液态玻璃效果已简化 - 移除鼠标跟随高光
+    // 液态玻璃效果 - 鼠标跟随高光
+    const quickNavBtn = document.getElementById('quickNavBtn');
+    if(quickNavBtn) {
+      quickNavBtn.addEventListener('mousemove', (e) => {
+        const rect = quickNavBtn.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        quickNavBtn.style.setProperty('--x', `${x}%`);
+        quickNavBtn.style.setProperty('--y', `${y}%`);
+      });
+      quickNavBtn.addEventListener('mouseleave', () => {
+        quickNavBtn.style.setProperty('--x', '50%');
+        quickNavBtn.style.setProperty('--y', '50%');
+      });
+    }
+    
+    const bottomNav = document.querySelector('.bottom-nav');
+    if(bottomNav) {
+      bottomNav.addEventListener('mousemove', (e) => {
+        const rect = bottomNav.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        bottomNav.style.setProperty('--x', `${x}%`);
+        bottomNav.style.setProperty('--y', `${y}%`);
+      });
+      bottomNav.addEventListener('mouseleave', () => {
+        bottomNav.style.setProperty('--x', '50%');
+        bottomNav.style.setProperty('--y', '50%');
+      });
+    }
     
     // 分析页面：全维度分析选择器change事件
     const analyzeSelect = document.getElementById('analyzeSelect');
