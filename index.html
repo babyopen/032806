@@ -332,56 +332,71 @@ body{
 }
 .filter-expand:active{opacity:0.6}
 
-/* 左下角快捷导航 */
-.quick-nav{
+/* 快捷导航圆形图标按钮 - 与底部导航栏同排左边 */
+.quick-nav-btn{
   position:fixed;
   left:16px;
-  bottom: calc(80px + var(--safe-bottom));
-  z-index:1000;
-  width:fit-content;
-  max-width: calc(100% - 32px);
-  background:rgba(255,255,255,0.8);
+  bottom:calc(20px + var(--safe-bottom));
+  z-index:1001;
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:rgba(30,30,30,0.95);
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
-  border-radius:20px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  transition:all var(--anim-normal);
-}
-/* backdrop-filter降级兼容 */
-@supports not (backdrop-filter: blur(20px)) {
-  .quick-nav{background:var(--card)}
-  .bottom-nav{background:var(--card)}
-}
-.quick-nav.collapsed{height:40px;width:70px}
-.quick-nav.expanded{height:auto;width: calc(100% - 32px)}
-.nav-toggle-btn{
-  width:100%;
-  height:40px;
-  border:none;
-  background:transparent;
-  color:var(--primary);
-  font-size:15px;
-  font-weight:500;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
-  display:grid;
-  place-items:center;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  transition:all var(--anim-fast);
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
-  tabindex:0;
+  color:rgba(255,255,255,0.8);
 }
+.quick-nav-btn:active{
+  transform:scale(0.95);
+  background:rgba(50,50,50,0.95);
+}
+.quick-nav-btn.active{
+  color:#fff;
+  background:rgba(255,107,53,0.9);
+}
+
+/* 快捷导航菜单 */
+.quick-nav-menu{
+  position:fixed;
+  left:16px;
+  bottom:calc(80px + var(--safe-bottom));
+  z-index:1000;
+  width:calc(100% - 32px);
+  max-width:360px;
+  background:rgba(30,30,30,0.95);
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+  border-radius:16px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  padding:12px;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(10px);
+  transition:all var(--anim-normal);
+}
+.quick-nav-menu.show{
+  opacity:1;
+  visibility:visible;
+  transform:translateY(0);
+}
+
 .nav-tabs{
-  display:grid !important;
-  grid-template-columns:repeat(4,1fr) !important;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
   gap:8px;
-  padding:10px 12px;
-  overflow-x:visible !important;
-  white-space:normal !important;
 }
 .nav-tabs::-webkit-scrollbar{display:none}
 .nav-tab{
-  padding:6px 12px;
+  padding:10px 8px;
   border-radius:15px;
   background:var(--bg-secondary);
   color:var(--text);
@@ -429,56 +444,48 @@ body{
 }
 .back-top-btn:active{opacity:0.6}
 
-/* 固定底部导航栏 */
+/* 固定底部导航栏 - 胶囊式设计 */
 .bottom-nav{
   position:fixed;
-  left:0;right:0;bottom:0;
+  left:50%;
+  bottom:calc(20px + var(--safe-bottom));
+  transform:translateX(-50%);
   z-index:999;
-  background:rgba(255,255,255,0.95);
+  background:rgba(30,30,30,0.95);
   -webkit-backdrop-filter:blur(25px);
   backdrop-filter:blur(25px);
   display:flex;
-  justify-content:space-around;
+  justify-content:center;
   align-items:center;
-  padding:16px 0 calc(16px + var(--safe-bottom));
-  border-top:0.5px solid var(--border);
-  box-shadow:0 -2px 10px rgba(0,0,0,0.05);
+  padding:6px;
+  border-radius:30px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  gap:4px;
 }
 
-/* 深色模式底部导航栏和快捷导航 */
-@media (prefers-color-scheme: dark) {
-  .bottom-nav{
-    background:rgba(28,28,30,0.95);
-    box-shadow:0 -2px 10px rgba(0,0,0,0.2);
-  }
-  
-  .quick-nav{
-    background:rgba(28,28,30,0.85);
-  }
-}
 .bottom-nav-item{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-width:60px;
-  height:36px;
-  font-size:15px;
+  min-width:70px;
+  height:40px;
+  font-size:14px;
   font-weight:500;
-  color:var(--sub-text);
-  border-radius:18px;
-  padding:0 12px;
+  color:rgba(255,255,255,0.6);
+  border-radius:20px;
+  padding:0 16px;
   transition:all var(--anim-fast);
   cursor:pointer;
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
   tabindex:0;
+  white-space:nowrap;
 }
 
 .bottom-nav-item.active{
-  color:var(--primary);
-  background:rgba(0,122,255,0.1);
-  transform:scale(1.03);
+  color:#fff;
+  background:rgba(255,255,255,0.2);
 }
 
 .bottom-nav-item:active{transform:scale(0.95)}
@@ -1657,39 +1664,39 @@ input[type="checkbox"]{
   <div class="page" id="randomPage" style="display:none">
     <div class="card">
       <div class="card-header"><h2>机选设置</h2></div>
-      <div class="card-body">
-        <div style="margin:10px 0">
-          <label>注数：</label>
-          <div class="num-input-group">
-            <input type="number" id="lotCount" min="1" max="49" value="5" inputmode="numeric">
+      <div class="card-body" style="padding:20px">
+        <div style="margin-bottom:20px">
+          <label style="display:block;margin-bottom:12px;font-size:15px;font-weight:500">注数：</label>
+          <div class="num-input-group" style="margin:0 0 16px 0">
+            <input type="number" id="lotCount" min="1" max="49" value="5" inputmode="numeric" style="padding:14px 18px;font-size:16px">
           </div>
-          <div class="quick-btns">
+          <div class="quick-btns" style="margin:0">
             <button class="quick-btn" data-count="1">1注</button>
             <button class="quick-btn" data-count="3">3注</button>
             <button class="quick-btn" data-count="5">5注</button>
             <button class="quick-btn" data-count="10">10注</button>
           </div>
         </div>
-        <div class="btn-bar" style="justify-content: center; margin: 4px 0;">
-          <button class="btn-line" data-action="runLottery">按条件机选</button>
-          <button class="btn-line" data-action="excludeLotteryResult">排除本次号码</button>
+        <div class="btn-bar" style="justify-content:center;margin:24px 0 16px;gap:12px">
+          <button class="btn-line" data-action="runLottery" style="padding:12px 20px;font-size:15px">按条件机选</button>
+          <button class="btn-line" data-action="excludeLotteryResult" style="padding:12px 20px;font-size:15px">排除本次号码</button>
         </div>
-        <p style="font-size:12px;color:var(--sub-text);margin-top:8px;text-align:center">点击号码可单独替换，所有号码自动去重</p>
-        <div class="disclaimer">机选结果仅为娱乐随机生成，非投注建议</div>
+        <p style="font-size:13px;color:var(--sub-text);margin:16px 0 12px;text-align:center;line-height:1.5">点击号码可单独替换，所有号码自动去重</p>
+        <div class="disclaimer" style="margin-top:16px">机选结果仅为娱乐随机生成，非投注建议</div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="margin-top:16px">
       <div class="card-header"><h2>机选结果</h2></div>
-      <div class="card-body" id="smartResult">
-        <div class="empty-tip">请先点击「按条件机选」生成号码</div>
+      <div class="card-body" id="smartResult" style="padding:20px;min-height:80px">
+        <div class="empty-tip" style="padding:30px 0">请先点击「按条件机选」生成号码</div>
       </div>
     </div>
-    <div class="card">
+    <div class="card" style="margin-top:16px">
       <div class="card-header">
         <h2>机选历史</h2>
         <button class="btn-mini red" data-action="clearSmartHistory">清空历史</button>
       </div>
-      <div class="card-body" id="smartHistory"></div>
+      <div class="card-body" id="smartHistory" style="padding:16px 20px"></div>
     </div>
   </div>
 
@@ -1994,10 +2001,16 @@ input[type="checkbox"]{
   </div>
 </div>
 
-<!-- 快捷导航 -->
-<div class="quick-nav collapsed" id="quickNav" role="navigation" aria-label="模块快捷导航">
-  <button class="nav-toggle-btn" id="navToggle" aria-label="展开快捷导航">导航</button>
-  <div class="nav-tabs" id="navTabs" style="display:none" role="tablist">
+<!-- 快捷导航 - 圆形图标按钮 -->
+<div class="quick-nav-btn" id="quickNavBtn" role="button" aria-label="展开快捷导航">
+  <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px">
+    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+  </svg>
+</div>
+
+<!-- 快捷导航菜单 -->
+<div class="quick-nav-menu" id="quickNavMenu" role="navigation" aria-label="模块快捷导航">
+  <div class="nav-tabs" id="navTabs" role="tablist">
     <button class="nav-tab" data-target="mod-saved" role="tab">我的方案</button>
     <button class="nav-tab" data-target="mod-zodiac" role="tab">生肖</button>
     <button class="nav-tab" data-target="mod-color" role="tab">波色</button>
@@ -2019,8 +2032,8 @@ input[type="checkbox"]{
 <!-- 固定底部导航栏 -->
 <div class="bottom-nav" role="navigation" aria-label="底部主导航">
   <div class="bottom-nav-item active" data-action="switchBottomNav" data-index="0">筛选</div>
-  <div class="bottom-nav-item" data-action="switchBottomNav" data-index="1">机选</div>
-  <div class="bottom-nav-item" data-action="switchBottomNav" data-index="2">分析</div>
+  <div class="bottom-nav-item" data-action="switchBottomNav" data-index="1">分析</div>
+  <div class="bottom-nav-item" data-action="switchBottomNav" data-index="2">机选</div>
   <div class="bottom-nav-item" data-action="switchBottomNav" data-index="3">我的</div>
 </div>
 
@@ -2818,8 +2831,8 @@ const DOM = {
   // 生肖标签
   zodiacTags: document.getElementById('zodiacTags'),
   // 快捷导航
-  quickNav: document.getElementById('quickNav'),
-  navToggle: document.getElementById('navToggle'),
+  quickNavBtn: document.getElementById('quickNavBtn'),
+  quickNavMenu: document.getElementById('quickNavMenu'),
   navTabs: document.getElementById('navTabs'),
   // 返回顶部
   backTopBtn: document.getElementById('backTopBtn')
@@ -3852,7 +3865,7 @@ const Business = {
     });
     
     // 切换页面显示
-    const pages = ['filterPage', 'randomPage', 'analysisPage', 'profilePage'];
+    const pages = ['filterPage', 'analysisPage', 'randomPage', 'profilePage'];
     pages.forEach((pageId, i) => {
       const pageEl = document.getElementById(pageId);
       if(pageEl) {
@@ -3877,14 +3890,18 @@ const Business = {
       }
     }
     
-    // 控制快捷导航的显示/隐藏：仅在筛选页面(index=0)显示
-    const quickNav = document.getElementById('quickNav');
-    if(quickNav) {
-      quickNav.style.display = index === 0 ? 'block' : 'none';
+    // 控制快捷导航按钮的显示/隐藏：仅在筛选页面(index=0)显示
+    const quickNavBtn = document.getElementById('quickNavBtn');
+    const quickNavMenu = document.getElementById('quickNavMenu');
+    if(quickNavBtn) {
+      quickNavBtn.style.display = index === 0 ? 'flex' : 'none';
+    }
+    if(quickNavMenu) {
+      quickNavMenu.classList.remove('show');
     }
     
     // 页面特定处理
-    if(index === 2) {
+    if(index === 1) {
       // 分析页面
       Business.initAnalysisPage();
     } else if(index === 3) {
@@ -5310,19 +5327,15 @@ const Business = {
    * @param {boolean|null} isOpen - 强制指定展开/收起
    */
   toggleQuickNav: (isOpen = null) => {
-    const isCollapsed = DOM.quickNav.classList.contains('collapsed');
-    const shouldOpen = isOpen === null ? isCollapsed : isOpen;
+    const isMenuVisible = DOM.quickNavMenu.classList.contains('show');
+    const shouldOpen = isOpen === null ? !isMenuVisible : isOpen;
 
     if(shouldOpen){
-      DOM.quickNav.classList.remove('collapsed');
-      DOM.quickNav.classList.add('expanded');
-      DOM.navToggle.style.display = 'none';
-      DOM.navTabs.style.display = 'flex';
+      DOM.quickNavMenu.classList.add('show');
+      DOM.quickNavBtn.classList.add('active');
     } else {
-      DOM.quickNav.classList.remove('expanded');
-      DOM.quickNav.classList.add('collapsed');
-      DOM.navTabs.style.display = 'none';
-      DOM.navToggle.style.display = 'grid';
+      DOM.quickNavMenu.classList.remove('show');
+      DOM.quickNavBtn.classList.remove('active');
     }
   },
 
@@ -5792,7 +5805,7 @@ const EventBinder = {
     }
 
     // 4. 快捷导航开关
-    if(target === DOM.navToggle){
+    if(target === DOM.quickNavBtn || target.closest('#quickNavBtn')){
       Business.toggleQuickNav();
       return;
     }
@@ -5924,8 +5937,12 @@ const EventBinder = {
    * @param {MouseEvent} e - 点击事件
    */
   handleClickOutside: (e) => {
-    if(!DOM.quickNav.contains(e.target) && DOM.quickNav.classList.contains('expanded')){
-      Business.toggleQuickNav(false);
+    const quickNavBtn = document.getElementById('quickNavBtn');
+    const quickNavMenu = document.getElementById('quickNavMenu');
+    if(quickNavMenu && quickNavMenu.classList.contains('show')){
+      if(!quickNavMenu.contains(e.target) && !quickNavBtn.contains(e.target)){
+        Business.toggleQuickNav(false);
+      }
     }
   },
 
