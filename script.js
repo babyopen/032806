@@ -2188,6 +2188,8 @@ const Business = {
 
     // 生肖预测
     const zodiacPredictionGrid = document.getElementById('zodiacPredictionGrid');
+    console.log('zodiacPredictionGrid:', zodiacPredictionGrid);
+    console.log('data.sortedZodiacs:', data.sortedZodiacs);
     if(zodiacPredictionGrid && data.sortedZodiacs) {
       let predictionHtml = '';
       data.sortedZodiacs.forEach(([zod, score], idx) => {
@@ -2203,8 +2205,11 @@ const Business = {
         if(details.shape > 0) tags.push(`形${details.shape}`);
         if(details.interval > 0) tags.push(`间${details.interval}`);
 
+        // 确保 zod 有值
+        if(!zod) zod = '未知';
+
         predictionHtml += `
-          <div class="zodiac-prediction-item ${topClass}">
+          <div class="zodiac-prediction-item ${topClass}" data-zodiac="${zod}">
             <div class="zodiac-prediction-zodiac">${zod}</div>
             <div class="zodiac-prediction-score">${score}分</div>
             <div class="zodiac-prediction-details">
@@ -2213,6 +2218,7 @@ const Business = {
           </div>
         `;
       });
+      console.log('predictionHtml:', predictionHtml);
       zodiacPredictionGrid.innerHTML = predictionHtml;
     }
 
@@ -2677,6 +2683,111 @@ const Business = {
     StateManager.clearAllTimers();
     window.removeEventListener('scroll', Business.handleScroll);
     window.removeEventListener('beforeunload', Business.handlePageUnload);
+  },
+
+  /**
+   * 显示生肖详情
+   * @param {string} zodiac - 生肖名称
+   */
+  showZodiacDetail: (zodiac) => {
+    const data = Business.calcZodiacAnalysis();
+    
+    // 即使没有历史数据，也显示基本信息
+    let score = 0;
+    let miss = 0;
+    let count = 0;
+    let total = 0;
+    let rate = '0%';
+    let details = { cold: 0, hot: 0, shape: 0, interval: 0 };
+    
+    if(data) {
+      details = data.zodiacDetails[zodiac];
+      score = data.zodiacScores[zodiac] || 0;
+      miss = data.zodMiss[zodiac] || 0;
+      count = data.zodCount[zodiac] || 0;
+      total = data.total || 0;
+      rate = total > 0 ? ((count / total) * 100).toFixed(1) + '%' : '0%';
+    }
+
+    // 生成详情HTML
+    let detailHtml = `
+      <div style="padding:16px;">
+        <h3 style="margin-top:0; color:var(--primary);">${zodiac} 详情分析</h3>
+        <div style="margin:12px 0;">
+          <div style="margin:8px 0;"><strong>综合评分：</strong>${score}分</div>
+          <div style="margin:8px 0;"><strong>出现次数：</strong>${count}次 (${rate})</div>
+          <div style="margin:8px 0;"><strong>遗漏期数：</strong>${miss}期</div>
+        </div>
+        <h4 style="margin:16px 0 8px 0; color:var(--primary);">评分详情</h4>
+        <div style="margin:12px 0;">
+          <div style="margin:4px 0;"><strong>冷号状态：</strong>${details.cold}分</div>
+          <div style="margin:4px 0;"><strong>热号状态：</strong>${details.hot}分</div>
+          <div style="margin:4px 0;"><strong>形态匹配：</strong>${details.shape}分</div>
+          <div style="margin:4px 0;"><strong>间隔匹配：</strong>${details.interval}分</div>
+        </div>
+        <h4 style="margin:16px 0 8px 0; color:var(--primary);">关联号码</h4>
+        <div style="margin:12px 0;">
+          ${Business.getZodiacNumbers(zodiac).map(num => {
+            const color = Business.getColor(num);
+            const numStr = String(num).padStart(2, '0');
+            return `<span style="display:inline-block; margin:4px; padding:4px 8px; background:${color === 'red' ? '#ff4d4f' : color === 'blue' ? '#1890ff' : '#52c41a'}; color:white; border-radius:4px;">${numStr}</span>`;
+          }).join('')}
+        </div>
+        ${!data ? '<div style="margin-top:16px; padding:12px; background:#f5f5f5; border-radius:4px;"><strong>提示：</strong>历史数据未加载，显示的是默认信息。请切换到分析页面加载历史数据后查看详细分析。</div>' : ''}
+      </div>
+    `;
+
+    // 创建弹窗
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:9999;
+      display:flex; align-items:center; justify-content:center;
+    `;
+
+    const content = document.createElement('div');
+    content.style.cssText = `
+      background:white; border-radius:8px; width:90%; max-width:400px; max-height:80vh;
+      overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.15);
+    `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.innerText = '关闭';
+    closeBtn.style.cssText = `
+      display:block; width:100%; padding:12px; background:var(--primary); color:white;
+      border:none; border-radius:0 0 8px 8px; cursor:pointer;
+    `;
+
+    content.innerHTML = detailHtml;
+    content.appendChild(closeBtn);
+    modal.appendChild(content);
+
+    // 关闭事件
+    closeBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    modal.addEventListener('click', (e) => {
+      if(e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    });
+
+    document.body.appendChild(modal);
+  },
+
+  /**
+   * 获取生肖对应的号码列表
+   * @param {string} zodiac - 生肖名称
+   * @returns {Array} 号码列表
+   */
+  getZodiacNumbers: (zodiac) => {
+    const numbers = [];
+    for(let num = 1; num <= 49; num++) {
+      if(DataQuery._getZodiacByNum(num) === zodiac) {
+        numbers.push(num);
+      }
+    }
+    return numbers;
   }
 };
 
@@ -2850,6 +2961,19 @@ const EventBinder = {
     const loadMoreBtn = target.closest('#loadMore');
     if(loadMoreBtn){
       Business.loadMoreHistory();
+      return;
+    }
+
+    // 9. 生肖预测项点击
+    console.log('Checking zodiac prediction item click...');
+    console.log('target:', target);
+    console.log('target.className:', target.className);
+    const zodiacItem = target.closest('.zodiac-prediction-item[data-zodiac]');
+    console.log('zodiacItem:', zodiacItem);
+    if(zodiacItem){
+      const zodiac = zodiacItem.dataset.zodiac;
+      console.log('zodiac:', zodiac);
+      Business.showZodiacDetail(zodiac);
       return;
     }
   },
