@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.03.05
+  小摇筛选 v26.3.03.1
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.03.05</title>
+<title>小摇筛选 v26.3.03.1</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -35,13 +35,13 @@
   --border:rgba(0,0,0,0.08);
   --overlay:rgba(0,0,0,0.75);
   --bg-secondary:#F8F8F8;
-  /* 通用样式变量 - 响应式适配 */
+  /* 通用样式变量 */
   --shadow-sm:0 2px 8px rgba(0,0,0,0.06);
   --shadow:0 4px 12px rgba(0,0,0,0.08);
-  --radius-sm:clamp(8px, 2.5vw, 10px);
-  --radius:clamp(14px, 4vw, 16px);
-  --radius-lg:clamp(18px, 5vw, 20px);
-  --ball-size:clamp(24px, 7vw, 32px);
+  --radius-sm:10px;
+  --radius:16px;
+  --radius-lg:20px;
+  --ball-size:28px;
   /* 安全区变量 */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -49,17 +49,10 @@
   --anim-fast:0.15s;
   --anim-normal:0.3s;
   --anim-slow:0.5s;
-  /* 布局常量 - 响应式适配 */
-  --top-card-height:clamp(180px, 55vw, 220px);
-  --top-offset:clamp(210px, 60vw, 250px);
+  /* 布局常量 */
+  --top-card-height:210px;
+  --top-offset:240px;
   --preview-max-count:8;
-  /* 响应式间距变量 */
-  --padding-sm:clamp(8px, 2.5vw, 12px);
-  --padding-md:clamp(12px, 3.5vw, 16px);
-  --padding-lg:clamp(16px, 4.5vw, 20px);
-  --margin-sm:clamp(6px, 1.8vw, 8px);
-  --margin-md:clamp(10px, 2.8vw, 12px);
-  --margin-lg:clamp(14px, 3.8vw, 16px);
 }
 
 /* 深色模式自动适配 */
@@ -153,37 +146,32 @@ body{
 .top-nums::-webkit-scrollbar{width:4px}
 .top-nums::-webkit-scrollbar-thumb{background:var(--sub-text);border-radius:2px;opacity:0.3}
 
-/* 主体内容区 - 响应式适配 */
+/* 主体内容区 */
 .body-box{
   margin-top: calc(var(--top-offset) + var(--safe-top));
-  padding:0 var(--padding-md);
+  padding:0 16px;
 }
 .card{
   background:var(--card);
   border-radius:var(--radius);
-  margin-bottom:var(--margin-md);
-  box-shadow:0 8px 32px rgba(0,0,0,0.1),0 0 0 0.5px rgba(255,255,255,0.2) inset;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
   overflow:hidden;
 }
 .card-header{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:var(--padding-md) var(--padding-lg);
+  padding:16px 20px;
 }
-.card-header h2{
-  font-size:clamp(14px, 4vw, 16px);
-  font-weight:600;
-}
-.card-body{
-  padding:var(--padding-sm) var(--padding-lg) var(--padding-lg);
-}
+.card-header h2{font-size:16px;font-weight:600}
+.card-body{padding:12px 20px 20px}
 
-/* 按钮组件 - 响应式适配 */
-.btn-group{display:flex;gap:var(--margin-sm);flex-wrap:wrap}
+/* 按钮组件 */
+.btn-group{display:flex;gap:6px;flex-wrap:wrap}
 .btn-mini{
-  padding:clamp(5px, 1.5vw, 7px) clamp(8px, 2.5vw, 12px);
-  font-size:clamp(11px, 3.2vw, 13px);
+  padding:6px 10px;
+  font-size:12px;
   border:none;
   border-radius:var(--radius-sm);
   background:var(--bg-secondary);
@@ -196,17 +184,16 @@ body{
 }
 .btn-mini:active{opacity:0.6}
 .btn-mini.red{background:rgba(255,59,48,0.1);color:var(--danger)}
-.btn-bar{display:flex;gap:var(--margin-md);margin-bottom:var(--margin-md)}
+.btn-bar{display:flex;gap:8px;margin-bottom:12px}
 .btn-line{
   flex:1;
-  padding:clamp(8px, 2.5vw, 12px) clamp(12px, 3.5vw, 16px);
+  padding:10px 14px;
   border:none;
   border-radius:var(--radius);
   background:var(--primary);
   color:#FFFFFF;
   cursor:pointer;
   font-weight:500;
-  font-size:clamp(14px, 4vw, 16px);
   transition:opacity var(--anim-fast);
   touch-action:manipulation;
   -webkit-user-select:none;
@@ -214,14 +201,14 @@ body{
 }
 .btn-line:active{opacity:0.7}
 
-/* 标签组件 - 响应式适配 */
-.tags{display:flex;flex-wrap:wrap;gap:var(--margin-sm);margin-top:var(--margin-md)}
+/* 标签组件 */
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .tag{
-  padding:clamp(6px, 2vw, 10px) clamp(10px, 3vw, 14px);
-  border-radius:clamp(16px, 5vw, 24px);
+  padding:8px 12px;
+  border-radius:20px;
   background:var(--bg-secondary);
   border:none;
-  font-size:clamp(12px, 3.5vw, 15px);
+  font-size:14px;
   cursor:pointer;
   transition:all var(--anim-fast);
   touch-action:manipulation;
@@ -370,31 +357,10 @@ body{
   border:1px solid rgba(255,255,255,0.4);
   overflow:hidden;
 }
-.quick-nav-btn::before{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
-               rgba(255,255,255,0.6) 0%,
-               transparent 70%);
-  opacity:0;
-  transition:opacity 0.2s;
-  pointer-events:none;
-  border-radius:inherit;
-}
-.quick-nav-btn:hover::before{opacity:1}
 @media (prefers-color-scheme: dark) {
   .quick-nav-btn{
     background:rgba(30,30,30,0.2);
     border:1px solid rgba(255,255,255,0.4);
-  }
-  .quick-nav-btn::before{
-    background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
-                 rgba(255,255,255,0.4) 0%,
-                 transparent 70%);
   }
 }
 .quick-nav-btn:hover{
@@ -524,31 +490,10 @@ body{
   overflow:hidden;
   transition:all 0.3s ease;
 }
-.bottom-nav::before{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
-               rgba(255,255,255,0.6) 0%,
-               transparent 70%);
-  opacity:0;
-  transition:opacity 0.2s;
-  pointer-events:none;
-  border-radius:inherit;
-}
-.bottom-nav:hover::before{opacity:1}
 @media (prefers-color-scheme: dark) {
   .bottom-nav{
     background:rgba(30,30,30,0.2);
     border:1px solid rgba(255,255,255,0.4);
-  }
-  .bottom-nav::before{
-    background:radial-gradient(circle at var(--x, 50%) var(--y, 50%),
-                 rgba(255,255,255,0.4) 0%,
-                 transparent 70%);
   }
 }
 .bottom-nav:hover{
@@ -628,127 +573,8 @@ input[type="checkbox"]{
   touch-action:manipulation;
 }
 
-/* 可访问性适配 - 降低透明度 */
-@media (prefers-reduced-transparency: reduce) {
-  .card, .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-  .card {
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    box-shadow: var(--shadow) !important;
-  }
-  .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
-    background: var(--bg-secondary) !important;
-    border: none !important;
-  }
-  .btn-line {
-    background: var(--primary) !important;
-  }
-  .tag.active {
-    background: var(--primary) !important;
-  }
-  .btn-mini.red, .exclude-tag.excluded {
-    background: rgba(255,59,48,0.1) !important;
-  }
-  .quick-nav-btn.active {
-    background: rgba(255,107,53,0.9) !important;
-  }
-}
-
-/* 可访问性适配 - 降低动态效果 */
-@media (prefers-reduced-motion: reduce) {
-  .card, .quick-nav-btn, .bottom-nav {
-    transition: none !important;
-    transform: none !important;
-  }
-}
-
-/* 小屏幕适配 (max-width: 375px) */
-@media (max-width: 375px) {
-  :root{
-    --top-card-height:clamp(160px, 50vw, 180px);
-    --top-offset:clamp(190px, 55vw, 210px);
-  }
-  .body-box{
-    padding:0 var(--padding-sm);
-  }
-  .card-header{
-    padding:var(--padding-sm) var(--padding-md);
-  }
-  .card-body{
-    padding:var(--padding-sm) var(--padding-md) var(--padding-md);
-  }
-  .btn-mini{padding:6px 8px;font-size:11px}
-  .tag{padding:7px 10px;font-size:13px}
-  .history-item{
-    padding:12px;
-    gap:8px;
-  }
-  .history-item .lottery-nums{
-    gap:4px;
-    justify-content:flex-start;
-    flex-wrap:nowrap;
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
-  }
-  .history-item .lottery-nums::-webkit-scrollbar{
-    display:none;
-  }
-  .history-item .num-ball{
-    width:22px;
-    height:22px;
-    font-size:10px;
-  }
-  .history-item .tag-zodiac{
-    font-size:7px;
-  }
-}
-
-/* 中等屏幕适配 (376px - 768px) */
-@media (min-width: 376px) and (max-width: 768px) {
-  :root{
-    --top-card-height:clamp(190px, 52vw, 210px);
-    --top-offset:clamp(220px, 58vw, 240px);
-  }
-}
-
-/* 大屏幕适配 (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  :root{
-    --top-card-height:clamp(200px, 45vw, 220px);
-    --top-offset:clamp(230px, 50vw, 250px);
-  }
-  .body-box{
-    padding:0 clamp(20px, 5vw, 24px);
-    max-width:800px;
-    margin-left:auto;
-    margin-right:auto;
-  }
-}
-
-/* 超大屏幕适配 (min-width: 1025px) */
-@media (min-width: 1025px) {
-  :root{
-    --top-card-height:clamp(210px, 35vw, 240px);
-    --top-offset:clamp(240px, 38vw, 280px);
-  }
-  .body-box{
-    padding:0 clamp(24px, 6vw, 32px);
-    max-width:900px;
-    margin-left:auto;
-    margin-right:auto;
-  }
-}
-
 /* 横屏适配 */
 @media (orientation: landscape) {
-  :root{
-    --top-card-height:clamp(140px, 40vh, 180px);
-    --top-offset:clamp(170px, 45vh, 210px);
-  }
   .quick-nav-menu{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
   .back-top-btn{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
 }
@@ -840,6 +666,41 @@ input[type="checkbox"]{
 .history-btns{
   display:flex;
   gap:6px;
+}
+
+/* 小屏适配 */
+@media (max-width: 375px) {
+  .btn-mini{padding:6px 8px;font-size:11px}
+  .tag{padding:7px 10px;font-size:13px}
+  
+  /* 机选历史记录小屏适配 */
+  .history-item{
+    padding:12px;
+    gap:8px;
+  }
+  
+  .history-item .lottery-nums{
+    gap:4px;
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  
+  .history-item .lottery-nums::-webkit-scrollbar{
+    display:none;
+  }
+  
+  .history-item .num-ball{
+    width:22px;
+    height:22px;
+    font-size:10px;
+  }
+  
+  .history-item .tag-zodiac{
+    font-size:7px;
+  }
 }
 
 /* ====================== 分析页面样式 ====================== */
@@ -1587,7 +1448,7 @@ input[type="checkbox"]{
   <div class="top-card">
     <div class="top-title">
       <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-      <span>v26.03.05</span>
+      <span>v26.3.03.1</span>
     </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -1903,7 +1764,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.03.05</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.03.1</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -5912,36 +5773,7 @@ const EventBinder = {
     // 全局错误捕获
     window.addEventListener('error', EventBinder.handleGlobalError);
     
-    // 液态玻璃效果 - 鼠标跟随高光
-    const quickNavBtn = document.getElementById('quickNavBtn');
-    if(quickNavBtn) {
-      quickNavBtn.addEventListener('mousemove', (e) => {
-        const rect = quickNavBtn.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        quickNavBtn.style.setProperty('--x', `${x}%`);
-        quickNavBtn.style.setProperty('--y', `${y}%`);
-      });
-      quickNavBtn.addEventListener('mouseleave', () => {
-        quickNavBtn.style.setProperty('--x', '50%');
-        quickNavBtn.style.setProperty('--y', '50%');
-      });
-    }
-    
-    const bottomNav = document.querySelector('.bottom-nav');
-    if(bottomNav) {
-      bottomNav.addEventListener('mousemove', (e) => {
-        const rect = bottomNav.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        bottomNav.style.setProperty('--x', `${x}%`);
-        bottomNav.style.setProperty('--y', `${y}%`);
-      });
-      bottomNav.addEventListener('mouseleave', () => {
-        bottomNav.style.setProperty('--x', '50%');
-        bottomNav.style.setProperty('--y', '50%');
-      });
-    }
+
     
     // 分析页面：全维度分析选择器change事件
     const analyzeSelect = document.getElementById('analyzeSelect');
