@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.2.00
+  小摇筛选 v26.3.01
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.2.00</title>
+<title>小摇筛选 v26.3.01</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -619,6 +619,35 @@ input[type="checkbox"]{
 @media (max-width: 375px) {
   .btn-mini{padding:6px 8px;font-size:11px}
   .tag{padding:7px 10px;font-size:13px}
+  
+  /* 机选历史记录小屏适配 */
+  .history-item{
+    padding:12px;
+    gap:8px;
+  }
+  
+  .history-item .lottery-nums{
+    gap:4px;
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  
+  .history-item .lottery-nums::-webkit-scrollbar{
+    display:none;
+  }
+  
+  .history-item .num-ball{
+    width:22px;
+    height:22px;
+    font-size:10px;
+  }
+  
+  .history-item .tag-zodiac{
+    font-size:7px;
+  }
 }
 
 /* ====================== 分析页面样式 ====================== */
@@ -1366,7 +1395,7 @@ input[type="checkbox"]{
   <div class="top-card">
     <div class="top-title">
       <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-      <span>v26.2.00</span>
+      <span>v26.3.01</span>
     </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -1682,7 +1711,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.2.00</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.01</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -2006,7 +2035,7 @@ input[type="checkbox"]{
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.3.01',
+  VERSION: '26.3.02',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
@@ -3624,27 +3653,16 @@ const Business = {
         const attrs = DataQuery.getNumAttrs(num);
         const s = num.toString().padStart(2, '0');
         return `
-<<<<<<< HEAD
-          <span class="history-num-item">
-            <span class="history-num ${attrs.color}色">${s}</span>
-            <span class="history-zodiac">${attrs.zodiac}</span>
-          </span>
-=======
           <div class="num-item">
             <div class="num-ball ${attrs.color}色">${s}</div>
             <div class="tag-zodiac">${attrs.zodiac}</div>
           </div>
->>>>>>> 9668390
         `;
       }).join('');
       
       wrapper.innerHTML = `
         <div>
-<<<<<<< HEAD
-          <div class="history-nums">${numsHtml}</div>
-=======
           <div class="lottery-nums">${numsHtml}</div>
->>>>>>> 9668390
           <div class="history-time">${item.time}</div>
         </div>
         <div class="history-btns">
