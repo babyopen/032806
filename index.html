@@ -335,11 +335,11 @@ body{
 /* 快捷导航圆形图标按钮 - 与底部导航栏同排左边 */
 .quick-nav-btn{
   position:fixed;
-  left:clamp(6px, 2vw, 8px);
-  bottom:calc(clamp(10px, 3vw, 14px) + var(--safe-bottom));
+  left:clamp(3px, 1vw, 5px);
+  bottom:calc(clamp(6px, 2vw, 10px) + var(--safe-bottom));
   z-index:1001;
-  width:clamp(40px, 12vw, 48px);
-  height:clamp(40px, 12vw, 48px);
+  width:clamp(44px, 13vw, 52px);
+  height:clamp(44px, 13vw, 52px);
   border-radius:50%;
   background:var(--card);
   -webkit-backdrop-filter:blur(20px);
@@ -450,10 +450,10 @@ body{
 /* 固定底部导航栏 - 胶囊式设计 */
 .bottom-nav{
   position:fixed;
-  left:clamp(8px, 2.5vw, 12px);
+  left:clamp(4px, 1.5vw, 6px);
   right:auto;
   transform:none;
-  bottom:calc(clamp(10px, 3vw, 14px) + var(--safe-bottom));
+  bottom:calc(clamp(6px, 2vw, 10px) + var(--safe-bottom));
   z-index:999;
   background:var(--card);
   -webkit-backdrop-filter:blur(25px);
@@ -461,17 +461,17 @@ body{
   display:flex;
   justify-content:flex-start;
   align-items:center;
-  padding:clamp(4px, 1vw, 6px);
-  border-radius:clamp(24px, 7vw, 30px);
+  padding:clamp(6px, 1.5vw, 8px);
+  border-radius:clamp(26px, 8vw, 32px);
   box-shadow:var(--shadow);
-  gap:clamp(2px, 1vw, 4px);
+  gap:clamp(4px, 1.5vw, 6px);
   border:1px solid var(--border);
   width:auto;
   min-width:200px;
 }
 
 .bottom-nav.needs-space{
-  left:calc(clamp(6px, 2vw, 8px) + clamp(40px, 12vw, 48px) + clamp(6px, 1.8vw, 8px));
+  left:calc(clamp(3px, 1vw, 5px) + clamp(44px, 13vw, 52px) + clamp(6px, 1.8vw, 8px));
   right:auto;
   transform:none;
   justify-content:flex-start;
@@ -481,13 +481,13 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-width:clamp(56px, 17vw, 70px);
-  height:clamp(32px, 10vw, 40px);
-  font-size:clamp(12px, 3.5vw, 14px);
+  min-width:clamp(60px, 18vw, 76px);
+  height:clamp(38px, 12vw, 46px);
+  font-size:clamp(13px, 4vw, 16px);
   font-weight:500;
   color:var(--sub-text);
-  border-radius:clamp(16px, 5vw, 20px);
-  padding:0 clamp(10px, 3vw, 16px);
+  border-radius:clamp(18px, 6vw, 22px);
+  padding:0 clamp(12px, 3.5vw, 18px);
   transition:all var(--anim-fast);
   cursor:pointer;
   touch-action:manipulation;
