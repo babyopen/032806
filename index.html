@@ -341,27 +341,29 @@ body{
   width:52px;
   height:52px;
   border-radius:50%;
-  background:rgba(30,30,30,0.95);
+  background:var(--card);
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  box-shadow:var(--shadow);
   transition:all var(--anim-fast);
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
-  color:rgba(255,255,255,0.8);
+  color:var(--text);
+  border:1px solid var(--border);
 }
 .quick-nav-btn:active{
   transform:scale(0.95);
-  background:rgba(50,50,50,0.95);
+  background:var(--bg-secondary);
 }
 .quick-nav-btn.active{
   color:#fff;
   background:rgba(255,107,53,0.9);
+  border:none;
 }
 
 /* 快捷导航菜单 */
@@ -372,16 +374,17 @@ body{
   z-index:1000;
   width:calc(100% - 32px);
   max-width:360px;
-  background:rgba(30,30,30,0.95);
+  background:var(--card);
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
   border-radius:16px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  box-shadow:var(--shadow);
   padding:12px;
   opacity:0;
   visibility:hidden;
   transform:translateY(10px);
   transition:all var(--anim-normal);
+  border:1px solid var(--border);
 }
 .quick-nav-menu.show{
   opacity:1;
@@ -447,11 +450,11 @@ body{
 /* 固定底部导航栏 - 胶囊式设计 */
 .bottom-nav{
   position:fixed;
-  left:50%;
+  left:84px;
+  right:16px;
   bottom:calc(20px + var(--safe-bottom));
-  transform:translateX(-50%);
   z-index:999;
-  background:rgba(30,30,30,0.95);
+  background:var(--card);
   -webkit-backdrop-filter:blur(25px);
   backdrop-filter:blur(25px);
   display:flex;
@@ -459,8 +462,9 @@ body{
   align-items:center;
   padding:6px;
   border-radius:30px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  box-shadow:var(--shadow);
   gap:4px;
+  border:1px solid var(--border);
 }
 
 .bottom-nav-item{
@@ -471,7 +475,7 @@ body{
   height:40px;
   font-size:14px;
   font-weight:500;
-  color:rgba(255,255,255,0.6);
+  color:var(--sub-text);
   border-radius:20px;
   padding:0 16px;
   transition:all var(--anim-fast);
@@ -484,8 +488,8 @@ body{
 }
 
 .bottom-nav-item.active{
-  color:#fff;
-  background:rgba(255,255,255,0.2);
+  color:var(--text);
+  background:var(--bg-secondary);
 }
 
 .bottom-nav-item:active{transform:scale(0.95)}
