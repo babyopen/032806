@@ -335,11 +335,11 @@ body{
 /* 快捷导航圆形图标按钮 - 与底部导航栏同排左边 */
 .quick-nav-btn{
   position:fixed;
-  left:clamp(12px, 4vw, 16px);
-  bottom:calc(clamp(16px, 5vw, 20px) + var(--safe-bottom));
+  left:clamp(6px, 2vw, 8px);
+  bottom:calc(clamp(10px, 3vw, 14px) + var(--safe-bottom));
   z-index:1001;
-  width:clamp(44px, 13vw, 52px);
-  height:clamp(44px, 13vw, 52px);
+  width:clamp(40px, 12vw, 48px);
+  height:clamp(40px, 12vw, 48px);
   border-radius:50%;
   background:var(--card);
   -webkit-backdrop-filter:blur(20px);
@@ -450,25 +450,29 @@ body{
 /* 固定底部导航栏 - 胶囊式设计 */
 .bottom-nav{
   position:fixed;
-  left:clamp(8px, 2.5vw, 12px);
-  right:clamp(8px, 2.5vw, 12px);
+  left:50%;
+  transform:translateX(-50%);
   bottom:calc(clamp(10px, 3vw, 14px) + var(--safe-bottom));
   z-index:999;
   background:var(--card);
   -webkit-backdrop-filter:blur(25px);
   backdrop-filter:blur(25px);
   display:flex;
-  justify-content:flex-start;
+  justify-content:center;
   align-items:center;
   padding:clamp(4px, 1vw, 6px);
   border-radius:clamp(24px, 7vw, 30px);
   box-shadow:var(--shadow);
   gap:clamp(2px, 1vw, 4px);
   border:1px solid var(--border);
+  width:auto;
+  min-width:200px;
 }
 
 .bottom-nav.needs-space{
-  left:calc(clamp(8px, 2.5vw, 12px) + clamp(44px, 13vw, 52px) + clamp(6px, 1.8vw, 8px));
+  left:calc(clamp(6px, 2vw, 8px) + clamp(40px, 12vw, 48px) + clamp(6px, 1.8vw, 8px));
+  right:clamp(8px, 2.5vw, 12px);
+  transform:none;
   justify-content:center;
 }
 
