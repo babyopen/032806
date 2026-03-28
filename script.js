@@ -6,7 +6,7 @@
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.1.00',
+  VERSION: '26.2.00',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({

@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.1.00
+  小摇筛选 v26.2.00
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.1.00</title>
+<title>小摇筛选 v26.2.00</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -1296,7 +1296,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>生肖</h2>
         <div class="btn-group" role="group" aria-label="生肖操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="zodiac">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="zodiac">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="zodiac">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="zodiac">清除</button>
@@ -1312,7 +1311,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>波色</h2>
         <div class="btn-group" role="group" aria-label="波色操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="color">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="color">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="color">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="color">清除</button>
@@ -1332,7 +1330,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>波色单双</h2>
         <div class="btn-group" role="group" aria-label="波色单双操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="colorsx">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="colorsx">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="colorsx">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="colorsx">清除</button>
@@ -1355,7 +1352,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>家禽野兽</h2>
         <div class="btn-group" role="group" aria-label="家禽野兽操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="type">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="type">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="type">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="type">清除</button>
@@ -1374,7 +1370,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>五行</h2>
         <div class="btn-group" role="group" aria-label="五行操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="element">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="element">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="element">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="element">清除</button>
@@ -1396,7 +1391,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>头数</h2>
         <div class="btn-group" role="group" aria-label="头数操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="head">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="head">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="head">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="head">清除</button>
@@ -1418,7 +1412,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>尾数</h2>
         <div class="btn-group" role="group" aria-label="尾数操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="tail">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="tail">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="tail">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="tail">清除</button>
@@ -1445,7 +1438,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>尾合</h2>
         <div class="btn-group" role="group" aria-label="尾合操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="sum">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="sum">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="sum">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="sum">清除</button>
@@ -1472,7 +1464,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>大小单双</h2>
         <div class="btn-group" role="group" aria-label="大小单双操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="bs">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="bs">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="bs">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="bs">清除</button>
@@ -1493,7 +1484,6 @@ input[type="checkbox"]{
       <div class="card-header">
         <h2>冷热号</h2>
         <div class="btn-group" role="group" aria-label="冷热号操作">
-          <button class="btn-mini" data-action="resetGroup" data-group="hot">重置</button>
           <button class="btn-mini" data-action="selectGroup" data-group="hot">全选</button>
           <button class="btn-mini" data-action="invertGroup" data-group="hot">反选</button>
           <button class="btn-mini red" data-action="clearGroup" data-group="hot">清除</button>
@@ -1836,7 +1826,7 @@ input[type="checkbox"]{
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.1.00',
+  VERSION: '26.2.00',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
