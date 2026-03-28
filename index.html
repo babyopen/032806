@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.3.03
+  小摇筛选 v26.03.05.1
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.3.03</title>
+<title>小摇筛选 v26.03.05.1</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -152,11 +152,32 @@ body{
   padding:0 16px;
 }
 .card{
-  background:var(--card);
+  background:rgba(255,255,255,0.2);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
   border-radius:var(--radius);
   margin-bottom:12px;
-  box-shadow:var(--shadow);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1),0 0 0 0.5px rgba(255,255,255,0.2) inset;
   overflow:hidden;
+  transition:transform 0.2s ease,box-shadow 0.2s,background 0.2s;
+  border:1px solid rgba(255,255,255,0.3);
+}
+@media (prefers-color-scheme: dark) {
+  .card{
+    background:rgba(30,30,30,0.2);
+    border:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 8px 32px rgba(0,0,0,0.2),0 0 0 0.5px rgba(255,255,255,0.1) inset;
+  }
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 16px 40px rgba(0,0,0,0.2);
+  background:rgba(255,255,255,0.25);
+}
+@media (prefers-color-scheme: dark) {
+  .card:hover{
+    background:rgba(30,30,30,0.25);
+  }
 }
 .card-header{
   display:flex;
@@ -341,24 +362,36 @@ body{
   width:clamp(48px, 14vw, 56px);
   height:clamp(48px, 14vw, 56px);
   border-radius:50%;
-  background:var(--card);
-  -webkit-backdrop-filter:blur(20px);
-  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.2);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
-  box-shadow:var(--shadow);
-  transition:all var(--anim-fast);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
+  transition:all 0.3s ease;
   touch-action:manipulation;
   -webkit-user-select:none;
   user-select:none;
   color:var(--text);
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,0.4);
+}
+@media (prefers-color-scheme: dark) {
+  .quick-nav-btn{
+    background:rgba(30,30,30,0.2);
+    border:1px solid rgba(255,255,255,0.4);
+  }
+}
+.quick-nav-btn:hover{
+  background:rgba(255,255,255,0.28);
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+  border-color:rgba(255,255,255,0.6);
+  transform:scale(1.02);
 }
 .quick-nav-btn:active{
   transform:scale(0.95);
-  background:var(--bg-secondary);
 }
 .quick-nav-btn.active{
   color:#fff;
@@ -374,7 +407,7 @@ body{
   z-index:1000;
   width:calc(100% - clamp(24px, 8vw, 32px));
   max-width:360px;
-  background:var(--card);
+  background:rgba(255,255,255,0.5);
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
   border-radius:clamp(12px, 4vw, 16px);
@@ -384,7 +417,13 @@ body{
   visibility:hidden;
   transform:translateY(10px);
   transition:all var(--anim-normal);
-  border:1px solid var(--border);
+  border:1px solid rgba(0,0,0,0.1);
+}
+@media (prefers-color-scheme: dark) {
+  .quick-nav-menu{
+    background:rgba(30,30,30,0.5);
+    border:1px solid rgba(255,255,255,0.15);
+  }
 }
 .quick-nav-menu.show{
   opacity:1;
@@ -424,7 +463,7 @@ body{
   width:clamp(38px, 11vw, 44px);
   height:clamp(38px, 11vw, 44px);
   border-radius:50%;
-  background:rgba(0,122,255,0.9);
+  background:rgba(0,122,255,0.5);
   -webkit-backdrop-filter:blur(10px);
   backdrop-filter:blur(10px);
   color:#FFFFFF;
@@ -455,19 +494,32 @@ body{
   transform:none;
   bottom:calc(2px + var(--safe-bottom));
   z-index:999;
-  background:var(--card);
-  -webkit-backdrop-filter:blur(25px);
-  backdrop-filter:blur(25px);
+  background:rgba(255,255,255,0.2);
+  -webkit-backdrop-filter:blur(16px);
+  backdrop-filter:blur(16px);
   display:flex;
   justify-content:flex-start;
   align-items:center;
   padding:clamp(4px, 1vw, 6px);
   border-radius:clamp(26px, 8vw, 32px);
-  box-shadow:var(--shadow);
+  box-shadow:0 8px 32px rgba(0,0,0,0.1);
   gap:clamp(4px, 1.5vw, 6px);
-  border:1px solid var(--border);
+  border:1px solid rgba(255,255,255,0.4);
   width:auto;
   min-width:200px;
+  transition:all 0.3s ease;
+}
+@media (prefers-color-scheme: dark) {
+  .bottom-nav{
+    background:rgba(30,30,30,0.2);
+    border:1px solid rgba(255,255,255,0.4);
+  }
+}
+.bottom-nav:hover{
+  background:rgba(255,255,255,0.28);
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+  border-color:rgba(255,255,255,0.6);
 }
 
 .bottom-nav.needs-space{
@@ -544,6 +596,43 @@ input[type="checkbox"]{
 @media (orientation: landscape) {
   .quick-nav-menu{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
   .back-top-btn{bottom: calc(clamp(64px, 16vw, 72px) + var(--safe-bottom))}
+}
+
+/* 可访问性适配 - 降低透明度 */
+@media (prefers-reduced-transparency: reduce) {
+  .card, .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  .card {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: var(--shadow) !important;
+  }
+  .quick-nav-btn, .bottom-nav, .btn-line, .btn-mini, .tag, .exclude-tag {
+    background: var(--bg-secondary) !important;
+    border: none !important;
+  }
+  .btn-line {
+    background: var(--primary) !important;
+  }
+  .tag.active {
+    background: var(--primary) !important;
+  }
+  .btn-mini.red, .exclude-tag.excluded {
+    background: rgba(255,59,48,0.1) !important;
+  }
+  .quick-nav-btn.active {
+    background: rgba(255,107,53,0.9) !important;
+  }
+}
+
+/* 可访问性适配 - 降低动态效果 */
+@media (prefers-reduced-motion: reduce) {
+  .card, .quick-nav-btn, .bottom-nav {
+    transition: none !important;
+    transform: none !important;
+  }
 }
 
 /* 机选页面样式 */
@@ -1415,7 +1504,7 @@ input[type="checkbox"]{
   <div class="top-card">
     <div class="top-title">
       <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-      <span>v26.3.03</span>
+      <span>v26.03.05.1</span>
     </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -1731,7 +1820,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.03</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：v26.03.05.1</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -2061,7 +2150,7 @@ input[type="checkbox"]{
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.3.03',
+  VERSION: '26.3.03.1',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
@@ -5739,6 +5828,8 @@ const EventBinder = {
     window.addEventListener('beforeunload', Business.handlePageUnload);
     // 全局错误捕获
     window.addEventListener('error', EventBinder.handleGlobalError);
+    
+    // 液态玻璃效果已简化 - 移除鼠标跟随高光
     
     // 分析页面：全维度分析选择器change事件
     const analyzeSelect = document.getElementById('analyzeSelect');
