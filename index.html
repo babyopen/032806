@@ -3795,7 +3795,13 @@ const Business = {
     const fragment = document.createDocumentFragment();
 
     favorites.forEach((item, index) => {
-      const previewList = Filter.getFilteredList(item.selected, item.excluded);
+      let previewList;
+      // 如果是精选特码收藏，优先使用 item.numbers
+      if(item.numbers && Array.isArray(item.numbers)) {
+        previewList = item.numbers.map(num => DataQuery.getNumAttrs(num));
+      } else {
+        previewList = Filter.getFilteredList(item.selected, item.excluded);
+      }
       const previewFragment = Utils.createFragment(previewList, (num) => {
         const wrapper = document.createElement('div');
         wrapper.className = 'num-item';
@@ -5576,7 +5582,8 @@ const Business = {
     const filterItem = {
       name: filterName,
       selected: {},
-      excluded: []
+      excluded: [],
+      numbers: numbers
     };
     
     // 获取状态
@@ -5605,11 +5612,23 @@ const Business = {
     const item = state.favorites[index];
     if(!item) return;
 
-    StateManager.setState({
-      selected: Utils.deepClone(item.selected),
-      excluded: Utils.deepClone(item.excluded)
-    });
-    Toast.show('加载成功');
+    // 如果是精选特码收藏，清空所有筛选条件
+    if(item.numbers && Array.isArray(item.numbers)) {
+      StateManager.setState({
+        selected: {
+          zodiac:[], color:[], colorsx:[], type:[], element:[],
+          head:[], tail:[], sum:[], bs:[], hot:[]
+        },
+        excluded: []
+      });
+      Toast.show('已加载精选特码收藏');
+    } else {
+      StateManager.setState({
+        selected: Utils.deepClone(item.selected),
+        excluded: Utils.deepClone(item.excluded)
+      });
+      Toast.show('加载成功');
+    }
   },
 
   /**
@@ -5641,7 +5660,14 @@ const Business = {
     const item = state.favorites[index];
     if(!item) return;
 
-    const list = Filter.getFilteredList(item.selected, item.excluded);
+    let list;
+    // 如果是精选特码收藏，优先使用 item.numbers
+    if(item.numbers && Array.isArray(item.numbers)) {
+      list = item.numbers.map(num => DataQuery.getNumAttrs(num));
+    } else {
+      list = Filter.getFilteredList(item.selected, item.excluded);
+    }
+    
     if(list.length === 0){
       Toast.show('该方案无符合条件的号码');
       return;
