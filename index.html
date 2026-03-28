@@ -363,13 +363,6 @@ body{
     border:1px solid rgba(255,255,255,0.4);
   }
 }
-.quick-nav-btn:hover{
-  background:rgba(255,255,255,0.28);
-  -webkit-backdrop-filter:blur(20px);
-  backdrop-filter:blur(20px);
-  border-color:rgba(255,255,255,0.6);
-  transform:scale(1.02);
-}
 .quick-nav-btn:active{
   transform:scale(0.95);
 }
@@ -496,13 +489,6 @@ body{
     border:1px solid rgba(255,255,255,0.4);
   }
 }
-.bottom-nav:hover{
-  background:rgba(255,255,255,0.28);
-  -webkit-backdrop-filter:blur(20px);
-  backdrop-filter:blur(20px);
-  border-color:rgba(255,255,255,0.6);
-}
-
 .bottom-nav.needs-space{
   left:calc(2px + clamp(48px, 14vw, 56px) + 4px);
   right:auto;
@@ -1809,9 +1795,9 @@ input[type="checkbox"]{
         <div class="analysis-card-title">特码全维度统计</div>
         <div class="analysis-filter-bar">
           <select id="analyzeSelect" class="analysis-filter-select">
-            <option value="10">最近10期</option>
+            <option value="10" selected>最近10期</option>
             <option value="20">最近20期</option>
-            <option value="30" selected>最近30期</option>
+            <option value="30">最近30期</option>
             <option value="all">全年数据</option>
           </select>
           <input type="number" id="customNum" class="analysis-filter-input" placeholder="自定义期数">
@@ -1987,9 +1973,9 @@ input[type="checkbox"]{
         <!-- 期数+号码数量双筛选栏 -->
         <div class="analysis-filter-bar">
           <select id="zodiacAnalyzeSelect" class="analysis-filter-select">
-            <option value="10">最近10期</option>
+            <option value="10" selected>最近10期</option>
             <option value="20">最近20期</option>
-            <option value="30" selected>最近30期</option>
+            <option value="30">最近30期</option>
             <option value="all">全年数据</option>
           </select>
           <input type="number" id="zodiacCustomNum" class="analysis-filter-input" placeholder="自定义期数">
@@ -5085,7 +5071,7 @@ const Business = {
     const zodiacCustomNum = document.getElementById('zodiacCustomNum');
     
     const custom = customNum ? customNum.value.trim() : '';
-    const selectVal = analyzeSelect ? analyzeSelect.value : '30';
+    const selectVal = analyzeSelect ? analyzeSelect.value : '10';
     const historyData = StateManager._state.analysis.historyData;
     
     const newLimit = custom && !isNaN(custom) && custom > 0
@@ -5124,7 +5110,7 @@ const Business = {
     
     // 期数同步
     const customPeriod = zodiacCustomNum ? zodiacCustomNum.value.trim() : '';
-    const selectPeriodVal = zodiacAnalyzeSelect ? zodiacAnalyzeSelect.value : '30';
+    const selectPeriodVal = zodiacAnalyzeSelect ? zodiacAnalyzeSelect.value : '10';
     const historyData = StateManager._state.analysis.historyData;
     
     const newLimit = customPeriod && !isNaN(customPeriod) && customPeriod > 0
