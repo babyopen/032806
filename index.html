@@ -2810,7 +2810,7 @@ const Storage = {
     // 如果有过期的记录被过滤掉，更新缓存
     if(filteredHistory.length < data.history.length) {
       Storage.saveLotteryHistory(filteredHistory);
-      console.log(`已清理 ${data.history.length - filteredHistory.length} 条过期机选历史记录`);
+      // 已清理过期记录
     }
 
     return filteredHistory;
@@ -4051,7 +4051,7 @@ const Business = {
       Business.renderZodiacAnalysis();
       Business.updateHotColdStatus();
       
-      console.log('数据已静默刷新');
+      // 数据已静默刷新
     } catch(e) {
       console.error('静默刷新失败', e);
     }
@@ -6038,7 +6038,7 @@ async function initApp() {
         historyData: cache.data 
       };
       StateManager.setState({ analysis: newAnalysis }, false);
-      console.log('已从缓存加载历史数据');
+      // 已从缓存加载历史数据
     }
     
     // 10. 加载机选历史缓存（自动清理3天前的记录）
@@ -6050,7 +6050,7 @@ async function initApp() {
           smartHistory: lotteryHistory
         }
       }, false);
-      console.log(`已从缓存加载 ${lotteryHistory.length} 条机选历史记录`);
+      // 已从缓存加载机选历史记录
     }
     
     // 11. 初始化事件绑定
@@ -6068,7 +6068,7 @@ async function initApp() {
     // 15. 隐藏加载遮罩
     Render.hideLoading();
     
-    console.log(`小摇筛选 v${CONFIG.VERSION} 初始化完成，当前农历生肖：${StateManager._state.currentZodiac}`);
+    // 应用初始化完成
   } catch(e) {
     console.error('应用初始化失败', e);
     Toast.show('页面初始化失败，请刷新重试');
