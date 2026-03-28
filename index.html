@@ -1102,16 +1102,24 @@ input[type="checkbox"]{
   border-bottom: none;
 }
 
+/* 分析页面历史记录项 - 垂直布局 */
+.history-item:has(.history-expect) {
+  display: block;
+  padding: 14px 0;
+}
+
 .history-expect {
   font-size: 14px;
   color: var(--sub-text);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   text-align: left;
 }
 
 .history-item .ball-group {
   justify-content: flex-start;
   gap: 8px;
+  margin: 0;
+  padding: 0;
 }
 
 /* 生肖关联专用样式 */
@@ -1998,7 +2006,7 @@ input[type="checkbox"]{
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.3.00',
+  VERSION: '26.3.01',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
