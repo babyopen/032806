@@ -301,15 +301,16 @@ body{
 .filter-row::-webkit-scrollbar-thumb{background:var(--sub-text);border-radius:2px;opacity:0.3}
 .filter-item-name{font-weight:600;font-size:14px;white-space:nowrap}
 .filter-preview{display:flex;gap:5px}
-.filter-item-btns{display:flex;gap:6px;margin-top:8px}
+.filter-item-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .filter-item-btns button{
-  flex:1;
-  padding:6px;
+  flex:1 1 calc(33.333% - 4px);
+  min-width:60px;
+  padding:clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 12px);
   border-radius:8px;
   border:none;
   background:var(--bg);
   color:var(--primary);
-  font-size:12px;
+  font-size:clamp(10px, 2.8vw, 14px);
   transition:opacity var(--anim-fast);
   touch-action:manipulation;
   -webkit-user-select:none;
