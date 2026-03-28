@@ -335,11 +335,11 @@ body{
 /* 快捷导航圆形图标按钮 - 与底部导航栏同排左边 */
 .quick-nav-btn{
   position:fixed;
-  left:clamp(3px, 1vw, 5px);
-  bottom:calc(clamp(6px, 2vw, 10px) + var(--safe-bottom));
+  left:2px;
+  bottom:calc(2px + var(--safe-bottom));
   z-index:1001;
-  width:clamp(44px, 13vw, 52px);
-  height:clamp(44px, 13vw, 52px);
+  width:clamp(48px, 14vw, 56px);
+  height:clamp(48px, 14vw, 56px);
   border-radius:50%;
   background:var(--card);
   -webkit-backdrop-filter:blur(20px);
@@ -450,10 +450,10 @@ body{
 /* 固定底部导航栏 - 胶囊式设计 */
 .bottom-nav{
   position:fixed;
-  left:clamp(4px, 1.5vw, 6px);
+  left:2px;
   right:auto;
   transform:none;
-  bottom:calc(clamp(6px, 2vw, 10px) + var(--safe-bottom));
+  bottom:calc(2px + var(--safe-bottom));
   z-index:999;
   background:var(--card);
   -webkit-backdrop-filter:blur(25px);
@@ -461,7 +461,7 @@ body{
   display:flex;
   justify-content:flex-start;
   align-items:center;
-  padding:clamp(6px, 1.5vw, 8px);
+  padding:clamp(4px, 1vw, 6px);
   border-radius:clamp(26px, 8vw, 32px);
   box-shadow:var(--shadow);
   gap:clamp(4px, 1.5vw, 6px);
@@ -471,7 +471,7 @@ body{
 }
 
 .bottom-nav.needs-space{
-  left:calc(clamp(3px, 1vw, 5px) + clamp(44px, 13vw, 52px) + clamp(6px, 1.8vw, 8px));
+  left:calc(2px + clamp(48px, 14vw, 56px) + 4px);
   right:auto;
   transform:none;
   justify-content:flex-start;
@@ -482,7 +482,7 @@ body{
   align-items:center;
   justify-content:center;
   min-width:clamp(60px, 18vw, 76px);
-  height:clamp(38px, 12vw, 46px);
+  height:clamp(40px, 12.5vw, 48px);
   font-size:clamp(13px, 4vw, 16px);
   font-weight:500;
   color:var(--sub-text);
