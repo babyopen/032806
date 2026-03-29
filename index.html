@@ -3922,18 +3922,58 @@ const Business = {
       }
     }
     
-    // 控制快捷导航按钮的显示/隐藏：仅在筛选页面(index=0)显示
+    // 控制快捷导航按钮的显示/隐藏：在筛选页面(index=0)和分析页面(index=1)显示
     const quickNavBtn = document.getElementById('quickNavBtn');
     const quickNavMenu = document.getElementById('quickNavMenu');
     const bottomNav = document.querySelector('.bottom-nav');
     if(quickNavBtn) {
-      quickNavBtn.style.display = index === 0 ? 'flex' : 'none';
+      quickNavBtn.style.display = (index === 0 || index === 1) ? 'flex' : 'none';
     }
     if(quickNavMenu) {
       quickNavMenu.classList.remove('show');
     }
     if(bottomNav) {
-      bottomNav.classList.toggle('needs-space', index === 0);
+      bottomNav.classList.toggle('needs-space', index === 0 || index === 1);
+    }
+    
+    // 根据页面切换快捷导航菜单内容
+    const navTabs = document.getElementById('navTabs');
+    if(navTabs) {
+      if(index === 0) {
+        // 筛选页面导航
+        navTabs.innerHTML = `
+          <button class="nav-tab" data-target="mod-saved" role="tab">我的方案</button>
+          <button class="nav-tab" data-target="mod-zodiac" role="tab">生肖</button>
+          <button class="nav-tab" data-target="mod-color" role="tab">波色</button>
+          <button class="nav-tab" data-target="mod-colorsx" role="tab">波色单双</button>
+          <button class="nav-tab" data-target="mod-type" role="tab">家禽野兽</button>
+          <button class="nav-tab" data-target="mod-element" role="tab">五行</button>
+          <button class="nav-tab" data-target="mod-head" role="tab">头数</button>
+          <button class="nav-tab" data-target="mod-tail" role="tab">尾数</button>
+          <button class="nav-tab" data-target="mod-sum" role="tab">尾合</button>
+          <button class="nav-tab" data-target="mod-bs" role="tab">大小单双</button>
+          <button class="nav-tab" data-target="mod-hot" role="tab">冷热号</button>
+        `;
+      } else if(index === 1) {
+        // 分析页面导航
+        navTabs.innerHTML = `
+          <button class="nav-tab" data-target="historyList" role="tab">历史记录</button>
+          <button class="nav-tab" data-target="analysisPanelContent" role="tab">全维度分析</button>
+          <button class="nav-tab" data-target="zodiacAnalysisPanel" role="tab">特码生肖关联</button>
+        `;
+      }
+      // 重新绑定导航标签点击事件
+      navTabs.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          const targetId = this.getAttribute('data-target');
+          const targetEl = document.getElementById(targetId);
+          if(targetEl) {
+            const offset = 80; // 偏移量
+            window.scrollTo({top: targetEl.offsetTop - offset, behavior: 'smooth'});
+          }
+          Business.toggleQuickNav(false);
+        });
+      });
     }
     
     // 页面特定处理
