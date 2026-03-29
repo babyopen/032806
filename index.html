@@ -301,16 +301,15 @@ body{
 .filter-row::-webkit-scrollbar-thumb{background:var(--sub-text);border-radius:2px;opacity:0.3}
 .filter-item-name{font-weight:600;font-size:14px;white-space:nowrap}
 .filter-preview{display:flex;gap:5px}
-.filter-item-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.filter-item-btns{display:flex;gap:6px;margin-top:8px}
 .filter-item-btns button{
-  flex:1 1 calc(33.333% - 4px);
-  min-width:60px;
-  padding:clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 12px);
+  flex:1;
+  padding:6px;
   border-radius:8px;
   border:none;
   background:var(--bg);
   color:var(--primary);
-  font-size:clamp(10px, 2.8vw, 14px);
+  font-size:12px;
   transition:opacity var(--anim-fast);
   touch-action:manipulation;
   -webkit-user-select:none;
@@ -3026,9 +3025,9 @@ const Render = {
             <button data-action="${CONFIG.ACTIONS.LOAD_FILTER}" data-index="${realIndex}">加载</button>
             <button data-action="${CONFIG.ACTIONS.RENAME_FILTER}" data-index="${realIndex}">重命名</button>
             <button data-action="${CONFIG.ACTIONS.COPY_FILTER}" data-index="${realIndex}">复制</button>
-            <button data-action="${CONFIG.ACTIONS.TOP_FILTER}" data-index="${realIndex}">置顶</button>
-            <button data-action="favoriteFilter" data-index="${realIndex}" ${isFavorited ? 'class="red"' : ''}>收藏</button>
-            <button class="del" data-action="${CONFIG.ACTIONS.DELETE_FILTER}" data-index="${realIndex}">删除</button>
+            <button data-action="${CONFIG.ACTIONS.TOP_FILTER}" data-index="${realIndex}">顶</button>
+            <button data-action="favoriteFilter" data-index="${realIndex}" ${isFavorited ? 'class="red"' : ''}>藏</button>
+            <button class="del" data-action="${CONFIG.ACTIONS.DELETE_FILTER}" data-index="${realIndex}">删</button>
           </div>
         `;
         itemWrapper.querySelector('.filter-preview').appendChild(previewFragment);
