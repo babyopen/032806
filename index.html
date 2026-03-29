@@ -1773,8 +1773,8 @@ input[type="checkbox"]{
     <!-- 标签栏 -->
     <div class="analysis-tab-bar">
       <button class="analysis-tab-btn active" id="tabHistory" data-analysis-tab="history">历史记录</button>
-      <button class="analysis-tab-btn" id="tabAnalysis" data-analysis-tab="analysis">全维度分析</button>
-      <button class="analysis-tab-btn" id="tabZodiac" data-analysis-tab="zodiac">特码生肖关联</button>
+      <button class="analysis-tab-btn" id="tabAnalysis" data-analysis-tab="analysis">维度分析</button>
+      <button class="analysis-tab-btn" id="tabZodiac" data-analysis-tab="zodiac">生肖关联</button>
     </div>
 
     <!-- 1. 历史记录模块 -->
@@ -1789,10 +1789,10 @@ input[type="checkbox"]{
       </div>
     </div>
 
-    <!-- 2. 全维度分析模块 -->
+    <!-- 2. 维度分析模块 -->
     <div class="analysis-tab-panel" id="analysisPanelContent">
       <div class="analysis-card">
-        <div class="analysis-card-title">特码全维度统计</div>
+        <div class="analysis-card-title">特码维度统计</div>
         <div class="analysis-filter-bar">
           <select id="analyzeSelect" class="analysis-filter-select">
             <option value="10" selected>最近10期</option>
@@ -1964,11 +1964,11 @@ input[type="checkbox"]{
       </div>
     </div>
 
-    <!-- 3. 特码生肖关联模块 -->
+    <!-- 3. 生肖关联模块 -->
     <div class="analysis-tab-panel" id="zodiacAnalysisPanel">
       <div class="analysis-card">
         <div class="analysis-card-title-row">
-          <div class="analysis-card-title" style="color:#13a662;">特码生肖·尾数关联</div>
+          <div class="analysis-card-title" style="color:#13a662;">生肖·尾数关联</div>
         </div>
         <!-- 期数+号码数量双筛选栏 -->
         <div class="analysis-filter-bar">
@@ -3958,8 +3958,8 @@ const Business = {
         // 分析页面导航
         navTabs.innerHTML = `
           <button class="nav-tab" data-target="historyPanel" role="tab">历史记录</button>
-          <button class="nav-tab" data-target="analysisPanelContent" role="tab">全维度分析</button>
-          <button class="nav-tab" data-target="zodiacAnalysisPanel" role="tab">特码生肖关联</button>
+          <button class="nav-tab" data-target="analysisPanelContent" role="tab">维度分析</button>
+          <button class="nav-tab" data-target="zodiacAnalysisPanel" role="tab">生肖关联</button>
         `;
       }
       // 重新绑定导航标签点击事件
@@ -3968,6 +3968,30 @@ const Business = {
           const targetId = this.getAttribute('data-target');
           const targetEl = document.getElementById(targetId);
           if(targetEl) {
+            // 分析页面标签切换逻辑
+            if(index === 1) {
+              // 移除所有标签和面板的active类
+              document.querySelectorAll('.analysis-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+              });
+              document.querySelectorAll('.analysis-tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+              });
+              
+              // 根据目标ID激活对应的标签和面板
+              if(targetId === 'historyPanel') {
+                document.getElementById('tabHistory').classList.add('active');
+                document.getElementById('historyPanel').classList.add('active');
+              } else if(targetId === 'analysisPanelContent') {
+                document.getElementById('tabAnalysis').classList.add('active');
+                document.getElementById('analysisPanelContent').classList.add('active');
+              } else if(targetId === 'zodiacAnalysisPanel') {
+                document.getElementById('tabZodiac').classList.add('active');
+                document.getElementById('zodiacAnalysisPanel').classList.add('active');
+              }
+            }
+            
+            // 滚动到目标位置
             const offset = 80; // 偏移量
             window.scrollTo({top: targetEl.offsetTop - offset, behavior: 'smooth'});
           }
