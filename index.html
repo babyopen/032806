@@ -1,5 +1,5 @@
 <!-- 
-  小摇筛选 v26.3.03.1
+  小摇筛选 v26.3.05.1
   代码结构说明：
   - CONFIG: 配置常量模块
   - Utils: 工具函数模块（节流、防抖、深拷贝等）
@@ -19,7 +19,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#007AFF">
-<title>小摇筛选 v26.3.03.1</title>
+<title>小摇筛选 v26.3.05.1</title>
 <style>
 /* 全局CSS变量（主题配置，一键修改样式） */
 :root{
@@ -1434,7 +1434,7 @@ input[type="checkbox"]{
   <div class="top-card">
     <div class="top-title">
       <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-      <span>v26.3.03.1</span>
+      <span>v26.3.05.1</span>
     </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -1625,6 +1625,10 @@ input[type="checkbox"]{
           <div class="tag" data-value="7" data-group="sum">合7</div>
           <div class="tag" data-value="8" data-group="sum">合8</div>
           <div class="tag" data-value="9" data-group="sum">合9</div>
+          <div class="tag" data-value="10" data-group="sum">合10</div>
+          <div class="tag" data-value="11" data-group="sum">合11</div>
+          <div class="tag" data-value="12" data-group="sum">合12</div>
+          <div class="tag" data-value="13" data-group="sum">合13</div>
         </div>
       </div>
     </div>
@@ -1640,11 +1644,17 @@ input[type="checkbox"]{
         </div>
       </div>
       <div class="card-body">
-        <div class="tags" data-group="bs" role="group" aria-label="大小单双选项">
+        <div class="tags" role="group" aria-label="大小单双选项">
           <div class="tag" data-value="大单" data-group="bs">大单</div>
           <div class="tag" data-value="小单" data-group="bs">小单</div>
           <div class="tag" data-value="大双" data-group="bs">大双</div>
           <div class="tag" data-value="小双" data-group="bs">小双</div>
+          <div class="tag" data-value="合单" data-group="sumOdd">合单</div>
+          <div class="tag" data-value="合双" data-group="sumOdd">合双</div>
+          <div class="tag" data-value="合大" data-group="sumBig">合大</div>
+          <div class="tag" data-value="合小" data-group="sumBig">合小</div>
+          <div class="tag" data-value="尾大" data-group="tailBig">尾大</div>
+          <div class="tag" data-value="尾小" data-group="tailBig">尾小</div>
         </div>
       </div>
     </div>
@@ -1750,7 +1760,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.03.1</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.05.1</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -2080,7 +2090,7 @@ input[type="checkbox"]{
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.3.03.1',
+  VERSION: '26.3.05.1',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
@@ -2337,10 +2347,17 @@ const DataQuery = {
     const s = num.toString().padStart(2, '0');
     const head = Math.floor(num / 10);
     const tail = num % 10;
-    const sum = (head + tail) % 10;
+    const sum = head + tail;
     const big = num >= 25 ? '大' : '小';
     const odd = num % 2 === 1 ? '单' : '双';
     const bs = big + odd;
+    
+    // 合单/合双/合大/合小
+    const sumOdd = sum % 2 === 1 ? '合单' : '合双';
+    const sumBig = sum >= 7 ? '合大' : '合小';
+    
+    // 尾大/尾小
+    const tailBig = tail >= 5 ? '尾大' : '尾小';
     
     const color = Object.keys(CONFIG.COLOR_MAP).find(c => CONFIG.COLOR_MAP[c].includes(num));
     const element = Object.keys(CONFIG.ELEMENT_MAP).find(e => CONFIG.ELEMENT_MAP[e].includes(num));
@@ -2360,7 +2377,10 @@ const DataQuery = {
       big,
       odd,
       bs,
-      colorsx: color + odd
+      colorsx: color + odd,
+      sumOdd,
+      sumBig,
+      tailBig
     };
   },
 
@@ -2457,7 +2477,8 @@ const StateManager = {
   _state: {
     selected: {
       zodiac:[], color:[], colorsx:[], type:[], element:[],
-      head:[], tail:[], sum:[], bs:[], hot:[]
+      head:[], tail:[], sum:[], bs:[], hot:[],
+      sumOdd:[], sumBig:[], tailBig:[]
     },
     excluded: [],
     excludeHistory: [],
@@ -2517,12 +2538,17 @@ const StateManager = {
    */
   updateSelected: (group, value) => {
     const state = StateManager._state;
+    console.log(`updateSelected: group=${group}, value=${value}, type=${typeof value}`);
+    console.log(`当前selected[${group}]:`, state.selected[group]);
     const index = state.selected[group].indexOf(value);
+    console.log(`indexOf结果:`, index);
     const newSelected = { ...state.selected };
     
     index > -1 
       ? newSelected[group] = newSelected[group].filter(item => item !== value)
       : newSelected[group] = [...newSelected[group], value];
+    
+    console.log(`更新后selected[${group}]:`, newSelected[group]);
 
     StateManager.setState({ selected: newSelected });
   },
@@ -3058,6 +3084,10 @@ const Render = {
       const list = [];
       for(let i=1; i<=49; i++){
         const attrs = DataQuery.getNumAttrs(i);
+        // 调试：打印合10-合13的号码
+        if(attrs.sum >= 10) {
+          console.log(`号码${i}: head=${attrs.head}, tail=${attrs.tail}, sum=${attrs.sum}`);
+        }
         list.push({
           num: attrs.num,
           s: attrs.s,
@@ -3070,6 +3100,9 @@ const Render = {
           head: attrs.head,
           tail: attrs.tail,
           sum: attrs.sum,
+          sumOdd: attrs.sumOdd,
+          sumBig: attrs.sumBig,
+          tailBig: attrs.tailBig,
           hot: '温号'
         });
       }
@@ -3158,6 +3191,13 @@ const Filter = {
       const targetSelected = selected || state.selected;
       const targetExcluded = excluded || state.excluded;
       const numList = state.numList;
+      
+      // 调试：打印筛选条件
+      console.log('筛选条件:', targetSelected);
+      console.log('号码列表长度:', numList.length);
+      if(numList.length > 0) {
+        console.log('第一个号码的sum:', numList[0].sum, '类型:', typeof numList[0].sum);
+      }
 
       return numList.filter(item => {
         // 排除号码
@@ -5730,7 +5770,8 @@ const Business = {
       StateManager.setState({
         selected: {
           zodiac:[], color:[], colorsx:[], type:[], element:[],
-          head:[], tail:[], sum:[], bs:[], hot:[]
+          head:[], tail:[], sum:[], bs:[], hot:[],
+          sumOdd:[], sumBig:[], tailBig:[]
         },
         excluded: []
       });
@@ -5886,7 +5927,9 @@ const EventBinder = {
     const tag = target.closest('.tag[data-group]');
     if(tag){
       const group = tag.dataset.group;
-      const value = Utils.formatTagValue(tag.dataset.value, group);
+      const rawValue = tag.dataset.value;
+      const value = Utils.formatTagValue(rawValue, group);
+      console.log(`点击标签: group=${group}, rawValue=${rawValue}, formattedValue=${value}, type=${typeof value}`);
       StateManager.updateSelected(group, value);
       return;
     }
