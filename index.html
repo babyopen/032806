@@ -6421,6 +6421,7 @@ const Business = {
       displayHistory.forEach((item, idx) => {
         const periodText = item.selectedPeriodText || (item.analyzeLimit >= 365 ? '全年数据' : `${item.analyzeLimit}期数据`);
         const numCount = item.numCount || item.numbers.length;
+        const itemMode = item.mode || 'hot'; // 获取模式，默认为热号模式
         
         // 生成模式标签
         const modeEmoji = itemMode === 'hot' ? '🔥' : itemMode === 'cold' ? '❄️' : itemMode === 'auto' ? '🤖' : '🔥';
