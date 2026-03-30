@@ -5437,7 +5437,7 @@ const Business = {
     
     try {
       const state = StateManager._state;
-      const history = state.analysis.zodiacPredictionHistory || [];
+      const history = Storage.get('zodiacPredictionHistory', []);
       
       if(displayIdx < 0 || displayIdx >= history.length) {
         Toast.show('删除失败：记录不存在');
@@ -5491,7 +5491,6 @@ const Business = {
       
       // 保存并重新渲染
       Storage.set('zodiacPredictionHistory', history);
-      StateManager.setState({ analysis: { ...state.analysis, zodiacPredictionHistory: history } }, false);
       Business.renderZodiacPredictionHistory();
       Toast.show('已删除');
     } catch(e) {
