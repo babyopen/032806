@@ -5020,19 +5020,14 @@ const Business = {
         const actualZodiacClass = isMatch ? 'history-tag hit' : 'history-tag miss';
         
         html += `
-          <div class="zodiac-history-item" data-index="${idx}" style="padding:10px;border-bottom:1px solid var(--border);font-size:13px;background:var(--card);border-radius:8px;margin-bottom:8px;position:relative;overflow:hidden;" ontouchstart="Business.handleZodiacHistoryTouchStart(event, ${idx})" ontouchmove="Business.handleZodiacHistoryTouchMove(event, ${idx})" ontouchend="Business.handleZodiacHistoryTouchEnd(event, ${idx})">
-            <div class="zodiac-history-content" style="transition:transform 0.3s ease;">
-              <div style="color:var(--sub-text);margin-bottom:8px;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
-                <span>${titleText}</span>
-                <span>${item.time}</span>
-              </div>
-              <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;">${predictions}</div>
-                ${actualZodiac ? `<span class="${actualZodiacClass}" style="flex-shrink:0;">${actualZodiac}</span>` : ''}
-              </div>
+          <div style="padding:10px;border-bottom:1px solid var(--border);font-size:13px;background:var(--card);border-radius:8px;margin-bottom:8px;">
+            <div style="color:var(--sub-text);margin-bottom:8px;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
+              <span>${titleText}</span>
+              <span>${item.time}</span>
             </div>
-            <div class="zodiac-history-delete" style="position:absolute;right:0;top:0;bottom:0;width:120px;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;transform:translateX(100%);transition:transform 0.3s ease;cursor:pointer;" onclick="Business.deleteZodiacHistoryItem(${idx})">
-              删除
+            <div style="display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;">${predictions}</div>
+              ${actualZodiac ? `<span class="${actualZodiacClass}" style="flex-shrink:0;">${actualZodiac}</span>` : ''}
             </div>
           </div>
         `;
@@ -5353,7 +5348,7 @@ const Business = {
   /**
    * 清空生肖预测历史
    */
-  clearZodiacPredictionHistory: () =&gt; {
+  clearZodiacPredictionHistory: () => {
     try {
       if(!confirm('确定要清空预测历史吗？')) {
         return;
@@ -5363,139 +5358,6 @@ const Business = {
       Toast.show('已清空预测历史');
     } catch(e) {
       console.error('清空预测历史失败', e);
-    }
-  },
-
-  // 生肖预测历史左滑删除相关变量
-  _zodiacHistoryTouchStartX: {},
-  _zodiacHistoryTouchCurrentX: {},
-  _zodiacHistoryDeleteThreshold: -120, // 滑动超过120px显示删除按钮
-
-  /**
-   * 生肖预测历史触摸开始
-   */
-  handleZodiacHistoryTouchStart: (e, idx) =&gt; {
-    Business._zodiacHistoryTouchStartX[idx] = e.touches[0].clientX;
-    Business._zodiacHistoryTouchCurrentX[idx] = e.touches[0].clientX;
-  },
-
-  /**
-   * 生肖预测历史触摸移动
-   */
-  handleZodiacHistoryTouchMove: (e, idx) =&gt; {
-    if(Business._zodiacHistoryTouchStartX[idx] === undefined) return;
-    
-    const currentX = e.touches[0].clientX;
-    Business._zodiacHistoryTouchCurrentX[idx] = currentX;
-    
-    const deltaX = currentX - Business._zodiacHistoryTouchStartX[idx];
-    const item = e.currentTarget;
-    const content = item.querySelector('.zodiac-history-content');
-    const deleteBtn = item.querySelector('.zodiac-history-delete');
-    
-    // 只允许向左滑动
-    if(deltaX < 0 && deltaX > Business._zodiacHistoryDeleteThreshold) {
-      content.style.transform = `translateX(${deltaX}px)`;
-      deleteBtn.style.transform = `translateX(${100 + deltaX / Business._zodiacHistoryDeleteThreshold * 100}%)`;
-    } else if(deltaX <= Business._zodiacHistoryDeleteThreshold) {
-      content.style.transform = `translateX(${Business._zodiacHistoryDeleteThreshold}px)`;
-      deleteBtn.style.transform = 'translateX(0)';
-    }
-  },
-
-  /**
-   * 生肖预测历史触摸结束
-   */
-  handleZodiacHistoryTouchEnd: (e, idx) =&gt; {
-    const item = e.currentTarget;
-    const content = item.querySelector('.zodiac-history-content');
-    const deleteBtn = item.querySelector('.zodiac-history-delete');
-    
-    const deltaX = Business._zodiacHistoryTouchCurrentX[idx] - Business._zodiacHistoryTouchStartX[idx];
-    
-    // 判断是否显示删除按钮
-    if(deltaX <= Business._zodiacHistoryDeleteThreshold / 2) {
-      // 显示删除按钮
-      content.style.transform = `translateX(${Business._zodiacHistoryDeleteThreshold}px)`;
-      deleteBtn.style.transform = 'translateX(0)';
-    } else {
-      // 恢复原位
-      content.style.transform = 'translateX(0)';
-      deleteBtn.style.transform = 'translateX(100%)';
-    }
-    
-    // 清理
-    delete Business._zodiacHistoryTouchStartX[idx];
-    delete Business._zodiacHistoryTouchCurrentX[idx];
-  },
-
-  /**
-   * 删除生肖预测历史单条记录
-   */
-  deleteZodiacHistoryItem: (displayIdx) =&gt; {
-    if(!confirm('确定删除这条记录吗？')) return;
-    
-    try {
-      const state = StateManager._state;
-      const history = Storage.get('zodiacPredictionHistory', []);
-      
-      if(displayIdx < 0 || displayIdx >= history.length) {
-        Toast.show('删除失败：记录不存在');
-        return;
-      }
-      
-      // 获取当前筛选状态
-      const show10Period = document.getElementById('show10Period')?.checked ?? true;
-      const show20Period = document.getElementById('show20Period')?.checked ?? false;
-      const show30Period = document.getElementById('show30Period')?.checked ?? false;
-      const showAllPeriod = document.getElementById('showAllPeriod')?.checked ?? false;
-      
-      // 根据勾选状态筛选历史记录，找到对应的实际索引
-      const filteredHistory = history.filter(item =&gt; {
-        const period = item.analyzeLimit;
-        const periodText = item.selectedPeriodText || '';
-        
-        let periodMatch = false;
-        if(show10Period && (period === 10 || periodText.includes('10期'))) periodMatch = true;
-        if(show20Period && (period === 20 || periodText.includes('20期'))) periodMatch = true;
-        if(show30Period && (period === 30 || periodText.includes('30期'))) periodMatch = true;
-        if(showAllPeriod && periodText.includes('全年')) periodMatch = true;
-        
-        return periodMatch;
-      });
-      
-      const isExpanded = state.zodiacPredictionHistoryExpanded || false;
-      const displayCount = isExpanded ? filteredHistory.length : Math.min(4, filteredHistory.length);
-      const displayHistory = filteredHistory.slice(0, displayCount);
-      
-      if(displayIdx < 0 || displayIdx >= displayHistory.length) {
-        Toast.show('删除失败：记录不存在');
-        return;
-      }
-      
-      // 找到要删除的记录
-      const itemToDelete = displayHistory[displayIdx];
-      
-      // 从原始历史记录中删除
-      const actualIdx = history.findIndex(h =&gt; 
-        h.timestamp === itemToDelete.timestamp && 
-        h.expect === itemToDelete.expect
-      );
-      
-      if(actualIdx === -1) {
-        Toast.show('删除失败：记录不存在');
-        return;
-      }
-      
-      history.splice(actualIdx, 1);
-      
-      // 保存并重新渲染
-      Storage.set('zodiacPredictionHistory', history);
-      Business.renderZodiacPredictionHistory();
-      Toast.show('已删除');
-    } catch(e) {
-      console.error('删除生肖预测历史记录失败', e);
-      Toast.show('删除失败');
     }
   },
 
@@ -6200,7 +6062,7 @@ const Business = {
                 </div>
               </div>
             </div>
-            <div class="special-history-delete" style="position:absolute;right:0;top:0;bottom:0;width:120px;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;transform:translateX(100%);transition:transform 0.3s ease;cursor:pointer;" onclick="Business.deleteSpecialHistoryItem(${idx})">
+            <div class="special-history-delete" style="position:absolute;right:0;top:0;bottom:0;width:100px;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;transform:translateX(100%);transition:transform 0.3s ease;cursor:pointer;" onclick="Business.deleteSpecialHistoryItem(${idx})">
               删除
             </div>
           </div>
@@ -6254,7 +6116,7 @@ const Business = {
   // 精选特码历史左滑删除相关变量
   _specialHistoryTouchStartX: {},
   _specialHistoryTouchCurrentX: {},
-  _specialHistoryDeleteThreshold: -120, // 滑动超过120px显示删除按钮
+  _specialHistoryDeleteThreshold: -150, // 滑动超过150px显示删除按钮
 
   /**
    * 精选特码历史触摸开始
@@ -6317,10 +6179,9 @@ const Business = {
   /**
    * 删除精选特码历史单条记录
    */
-  deleteSpecialHistoryItem: (displayIdx) =&gt; {
-    if(!confirm('确定删除这条记录吗？')) return;
-    
+  deleteSpecialHistoryItem: (displayIdx) => {
     try {
+      if(!confirm('确定删除该记录？')) return;
       const state = StateManager._state;
       const history = state.specialHistory || [];
       
