@@ -329,6 +329,28 @@ body{
   border:1px solid var(--primary);
 }
 
+/* 筛选面板操作按钮（全选、清空、确认）保持默认样式 */
+.filter-panel-buttons .btn-mini,
+#specialFiltersPanel .btn-mini[data-action^="selectAll"],
+#specialFiltersPanel .btn-mini[data-action^="reset"],
+#specialFiltersPanel .btn-mini[data-action^="confirm"],
+#predictionFiltersPanel .btn-mini[data-action^="selectAll"],
+#predictionFiltersPanel .btn-mini[data-action^="reset"],
+#predictionFiltersPanel .btn-mini[data-action^="confirm"]{
+  background:var(--bg-secondary);
+  color:var(--primary);
+  border:1px solid var(--border);
+}
+
+/* 确认按钮保持特殊样式 */
+.filter-panel-buttons .btn-mini[data-action^="confirm"],
+#specialFiltersPanel .btn-mini[data-action^="confirm"],
+#predictionFiltersPanel .btn-mini[data-action^="confirm"]{
+  background:var(--primary) !important;
+  color:#fff !important;
+  border:1px solid var(--primary) !important;
+}
+
 /* 号码球组件 */
 .num-item{
   display:flex;
@@ -765,8 +787,26 @@ input[type="checkbox"]{
 
 /* 小屏适配 */
 @media (max-width: 375px) {
-  .btn-mini{padding:6px 8px;font-size:11px}
+  .btn-mini{padding:0;font-size:11px;min-width:44px;height:28px}
   .tag{padding:7px 10px;font-size:13px}
+  
+  /* 筛选面板小屏适配 */
+  #predictionFiltersPanel .filter-panel-row,
+  #specialFiltersPanel .filter-panel-row{
+    gap:6px;
+  }
+  
+  #predictionFiltersPanel .filter-panel-row > div,
+  #specialFiltersPanel .filter-panel-row > div{
+    gap:3px;
+  }
+  
+  #predictionFiltersPanel .btn-mini,
+  #specialFiltersPanel .btn-mini{
+    min-width:44px;
+    height:28px;
+    font-size:10px;
+  }
   
   /* 机选历史记录小屏适配 */
   .history-item{
