@@ -3923,10 +3923,14 @@ const Business = {
     // 根据模式选择不同的筛选策略
     if(mode === 'cold') {
       // ❄️ 冷号反弹模式
+      console.log('[冷号模式] 开始计算...');
       finalNums = Business.getColdReboundNumbers(data, targetCount, fullNumZodiacMap);
+      console.log('[冷号模式] 结果:', finalNums);
     } else if(mode === 'auto') {
       // 🤖 自动模式：智能判断使用热号还是冷号模式
+      console.log('[自动模式] 开始决策...');
       const modeDecision = Business.decideAutoMode(data);
+      console.log('[自动模式] 决策结果:', modeDecision);
       if(modeDecision === 'cold') {
         finalNums = Business.getColdReboundNumbers(data, targetCount, fullNumZodiacMap);
       } else {
@@ -4131,7 +4135,29 @@ const Business = {
 
     // 按反弹潜力分排序，取前N个
     scoredCandidates.sort((a, b) => b.score - a.score);
-    return scoredCandidates.slice(0, targetCount).map(i => i.num);
+    let finalNums = scoredCandidates.slice(0, targetCount).map(i => i.num);
+    
+    // 兜底机制：如果冷号候选不足，从遗漏期数最长的号码中补充
+    if(finalNums.length < targetCount) {
+      const remainingCount = targetCount - finalNums.length;
+      const sortedByMiss = coldCandidates
+        .filter(c => !finalNums.includes(c.num))
+        .sort((a, b) => b.miss - a.miss)
+        .slice(0, remainingCount)
+        .map(c => c.num);
+      finalNums.push(...sortedByMiss);
+    }
+    
+    // 如果还是不足，随机补充（兜底）
+    if(finalNums.length < targetCount) {
+      for(let num = 1; num <= 49 && finalNums.length < targetCount; num++) {
+        if(!finalNums.includes(num)) {
+          finalNums.push(num);
+        }
+      }
+    }
+    
+    return finalNums;
   },
 
   /**
