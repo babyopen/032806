@@ -4284,10 +4284,11 @@ const Business = {
 
   /**
    * 刷新历史数据
+   * @param {boolean} silent - 是否静默模式（不显示提示）
    */
-  refreshHistory: async () => {
+  refreshHistory: async (silent = false) => {
     const historyList = document.getElementById('historyList');
-    if(historyList) historyList.innerHTML = '<div style="padding:20px;text-align:center;">加载中...</div>';
+    if(historyList && !silent) historyList.innerHTML = '<div style="padding:20px;text-align:center;">加载中...</div>';
     
     try {
       const year = new Date().getFullYear();
@@ -4338,13 +4339,13 @@ const Business = {
       // 重新渲染精选特码历史以显示最新比较结果
       Business.renderSpecialHistory();
       
-      Toast.show('数据加载成功');
+      if(!silent) Toast.show('数据加载成功');
     } catch(e) {
       console.error('加载历史数据失败', e);
-      if(historyList) {
+      if(historyList && !silent) {
         historyList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">数据加载失败，请刷新重试</div>';
       }
-      Toast.show('数据加载失败');
+      if(!silent) Toast.show('数据加载失败');
     }
     
     const loadMore = document.getElementById('loadMore');
@@ -5558,7 +5559,7 @@ const Business = {
     
     const newTimer = setInterval(() => {
       if(Business.isInDrawTime()) {
-        Business.refreshHistory();
+        Business.refreshHistory(true); // 静默模式，不显示提示
       } else {
         clearInterval(state.analysis.autoRefreshTimer);
         const newAnalysis = { 
@@ -6749,32 +6750,16 @@ const Business = {
   },
 
   /**
-   * 全选预测历史的期数
+   * 通用设置按钮组状态
+   * @param {string} selector - 按钮选择器
+   * @param {Array} activeValues - 需要激活的值数组
+   * @param {string} dataAttr - data属性名
    */
-  selectAllPredictionPeriods: () => {
-    // 设置按钮状态
-    const buttons = document.querySelectorAll('.prediction-period-btn');
+  setButtonGroupState: (selector, activeValues, dataAttr = 'data-value') => {
+    const buttons = document.querySelectorAll(selector);
     buttons.forEach(btn => {
-      btn.classList.add('active');
-      btn.style.background = 'var(--primary)';
-      btn.style.color = '#fff';
-    });
-    
-    Business.savePredictionHistoryFilter();
-    Business.renderZodiacPredictionHistory();
-    // 自动折叠面板
-    Business.togglePanel('predictionFiltersPanel');
-  },
-
-  /**
-   * 重置预测历史的期数（保留10期勾选）
-   */
-  resetPredictionPeriods: () => {
-    // 重置所有按钮状态
-    const buttons = document.querySelectorAll('.prediction-period-btn');
-    buttons.forEach(btn => {
-      const period = btn.dataset.period;
-      if(period === '10') {
+      const value = btn.getAttribute(dataAttr);
+      if(activeValues.includes(value)) {
         btn.classList.add('active');
         btn.style.background = 'var(--primary)';
         btn.style.color = '#fff';
@@ -6784,10 +6769,44 @@ const Business = {
         btn.style.color = '';
       }
     });
-    
+  },
+
+  /**
+   * 通用切换按钮状态
+   * @param {HTMLElement} btn - 按钮元素
+   * @returns {boolean} 切换后的激活状态
+   */
+  toggleButtonState: (btn) => {
+    const isActive = btn.classList.contains('active');
+    if(isActive) {
+      btn.classList.remove('active');
+      btn.style.background = '';
+      btn.style.color = '';
+    } else {
+      btn.classList.add('active');
+      btn.style.background = 'var(--primary)';
+      btn.style.color = '#fff';
+    }
+    return !isActive;
+  },
+
+  /**
+   * 全选预测历史的期数
+   */
+  selectAllPredictionPeriods: () => {
+    Business.setButtonGroupState('.prediction-period-btn', ['10', '20', '30', 'all'], 'data-period');
     Business.savePredictionHistoryFilter();
     Business.renderZodiacPredictionHistory();
-    // 自动折叠面板
+    Business.togglePanel('predictionFiltersPanel');
+  },
+
+  /**
+   * 重置预测历史的期数（保留10期勾选）
+   */
+  resetPredictionPeriods: () => {
+    Business.setButtonGroupState('.prediction-period-btn', ['10'], 'data-period');
+    Business.savePredictionHistoryFilter();
+    Business.renderZodiacPredictionHistory();
     Business.togglePanel('predictionFiltersPanel');
   },
 
@@ -7466,22 +7485,10 @@ const Business = {
    * 全选精选特码历史的筛选条件
    */
   selectAllSpecialFilters: () => {
-    // 设置期数按钮状态
-    document.querySelectorAll('.special-period-btn').forEach(btn => {
-      btn.classList.add('active');
-      btn.style.background = 'var(--primary)';
-      btn.style.color = '#fff';
-    });
-    // 设置号码数量按钮状态
-    document.querySelectorAll('.special-num-btn').forEach(btn => {
-      btn.classList.add('active');
-      btn.style.background = 'var(--primary)';
-      btn.style.color = '#fff';
-    });
-    
+    Business.setButtonGroupState('.special-period-btn', ['10', '20', '30', 'all'], 'data-period');
+    Business.setButtonGroupState('.special-num-btn', ['5', '10', '15', '20'], 'data-num');
     Business.saveSpecialHistoryFilter();
     Business.renderSpecialHistory();
-    // 自动折叠面板
     Business.togglePanel('specialFiltersPanel');
   },
 
@@ -7489,36 +7496,10 @@ const Business = {
    * 重置精选特码历史的筛选条件（保留10期5个号勾选）
    */
   resetSpecialFilters: () => {
-    // 重置期数按钮状态
-    document.querySelectorAll('.special-period-btn').forEach(btn => {
-      const period = btn.dataset.period;
-      if(period === '10') {
-        btn.classList.add('active');
-        btn.style.background = 'var(--primary)';
-        btn.style.color = '#fff';
-      } else {
-        btn.classList.remove('active');
-        btn.style.background = '';
-        btn.style.color = '';
-      }
-    });
-    // 重置号码数量按钮状态
-    document.querySelectorAll('.special-num-btn').forEach(btn => {
-      const num = btn.dataset.num;
-      if(num === '5') {
-        btn.classList.add('active');
-        btn.style.background = 'var(--primary)';
-        btn.style.color = '#fff';
-      } else {
-        btn.classList.remove('active');
-        btn.style.background = '';
-        btn.style.color = '';
-      }
-    });
-    
+    Business.setButtonGroupState('.special-period-btn', ['10'], 'data-period');
+    Business.setButtonGroupState('.special-num-btn', ['5'], 'data-num');
     Business.saveSpecialHistoryFilter();
     Business.renderSpecialHistory();
-    // 自动折叠面板
     Business.togglePanel('specialFiltersPanel');
   },
 
@@ -7799,35 +7780,7 @@ const EventBinder = {
     // 12. 预测历史期数按钮
     const predictionPeriodBtn = target.closest('.prediction-period-btn[data-period]');
     if(predictionPeriodBtn){
-      const period = predictionPeriodBtn.dataset.period;
-      const isActive = predictionPeriodBtn.classList.contains('active');
-      
-      // 切换激活状态
-      if(isActive){
-        predictionPeriodBtn.classList.remove('active');
-        predictionPeriodBtn.style.background = '';
-        predictionPeriodBtn.style.color = '';
-      } else {
-        predictionPeriodBtn.classList.add('active');
-        predictionPeriodBtn.style.background = 'var(--primary)';
-        predictionPeriodBtn.style.color = '#fff';
-      }
-      
-      // 更新对应的隐藏复选框状态（用于兼容原有逻辑）
-      const checkboxMap = {
-        '10': 'show10Period',
-        '20': 'show20Period',
-        '30': 'show30Period',
-        'all': 'showAllPeriod'
-      };
-      const checkboxId = checkboxMap[period];
-      if(checkboxId){
-        const checkbox = document.getElementById(checkboxId);
-        if(checkbox){
-          checkbox.checked = !isActive;
-        }
-      }
-      
+      Business.toggleButtonState(predictionPeriodBtn);
       Business.savePredictionHistoryFilter();
       Business.renderZodiacPredictionHistory();
       return;
@@ -7836,33 +7789,7 @@ const EventBinder = {
     // 13. 精选特码历史期数按钮
     const specialPeriodBtn = target.closest('.special-period-btn[data-period]');
     if(specialPeriodBtn){
-      const period = specialPeriodBtn.dataset.period;
-      const isActive = specialPeriodBtn.classList.contains('active');
-      
-      if(isActive){
-        specialPeriodBtn.classList.remove('active');
-        specialPeriodBtn.style.background = '';
-        specialPeriodBtn.style.color = '';
-      } else {
-        specialPeriodBtn.classList.add('active');
-        specialPeriodBtn.style.background = 'var(--primary)';
-        specialPeriodBtn.style.color = '#fff';
-      }
-      
-      const checkboxMap = {
-        '10': 'showSpecial10Period',
-        '20': 'showSpecial20Period',
-        '30': 'showSpecial30Period',
-        'all': 'showSpecialAllPeriod'
-      };
-      const checkboxId = checkboxMap[period];
-      if(checkboxId){
-        const checkbox = document.getElementById(checkboxId);
-        if(checkbox){
-          checkbox.checked = !isActive;
-        }
-      }
-      
+      Business.toggleButtonState(specialPeriodBtn);
       Business.saveSpecialHistoryFilter();
       Business.renderSpecialHistory();
       return;
@@ -7871,33 +7798,7 @@ const EventBinder = {
     // 14. 精选特码历史号码数量按钮
     const specialNumBtn = target.closest('.special-num-btn[data-num]');
     if(specialNumBtn){
-      const num = specialNumBtn.dataset.num;
-      const isActive = specialNumBtn.classList.contains('active');
-      
-      if(isActive){
-        specialNumBtn.classList.remove('active');
-        specialNumBtn.style.background = '';
-        specialNumBtn.style.color = '';
-      } else {
-        specialNumBtn.classList.add('active');
-        specialNumBtn.style.background = 'var(--primary)';
-        specialNumBtn.style.color = '#fff';
-      }
-      
-      const checkboxMap = {
-        '5': 'showSpecial5Num',
-        '10': 'showSpecial10Num',
-        '15': 'showSpecial15Num',
-        '20': 'showSpecial20Num'
-      };
-      const checkboxId = checkboxMap[num];
-      if(checkboxId){
-        const checkbox = document.getElementById(checkboxId);
-        if(checkbox){
-          checkbox.checked = !isActive;
-        }
-      }
-      
+      Business.toggleButtonState(specialNumBtn);
       Business.saveSpecialHistoryFilter();
       Business.renderSpecialHistory();
       return;
