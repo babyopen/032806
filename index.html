@@ -6350,7 +6350,144 @@ const EventBinder = {
       return;
     }
 
+    // 10. 数字标签点击（支持number-tag和history-tag）
+    const numberTag = target.closest('.number-tag, .history-tag');
+    if(numberTag){
+      const text = numberTag.innerText.trim();
+      
+      // 检查是否是数字
+      if(!isNaN(text)) {
+        try {
+          const num = parseInt(text);
+          const attrs = DataQuery.getNumAttrs(num);
+          const color = attrs.color;
+          const element = attrs.element;
+          const zodiac = attrs.zodiac;
+          const colorClass = color === '红' ? 'red' : color === '蓝' ? 'blue' : 'green';
+          
+          // 创建弹窗显示数字信息
+          const modal = document.createElement('div');
+          modal.style.cssText = `
+            position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:9999;
+            display:flex; align-items:center; justify-content:center;
+          `;
 
+          const content = document.createElement('div');
+          content.style.cssText = `
+            background:var(--card); border-radius:12px; width:160px; text-align:center;
+            padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          `;
+
+          // 生成数字球的HTML
+          let ballHtml = `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+              <div class="ball ${colorClass}" style="width:40px; height:40px; font-size:16px; display:flex; align-items:center; justify-content:center;">${String(num).padStart(2, '0')}</div>
+              <div style="font-size:14px; color:var(--text); text-align:center;">${zodiac} / ${element}</div>
+            </div>
+          `;
+
+          const closeBtn = document.createElement('button');
+          closeBtn.innerText = '关闭';
+          closeBtn.style.cssText = `
+            display:block; width:100%; margin-top:16px; padding:8px; background:var(--primary); color:white;
+            border:none; border-radius:6px; cursor:pointer; font-size:14px;
+          `;
+
+          content.innerHTML = ballHtml;
+          content.appendChild(closeBtn);
+          modal.appendChild(content);
+
+          // 关闭事件
+          closeBtn.addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+
+          modal.addEventListener('click', (e) => {
+            if(e.target === modal) {
+              document.body.removeChild(modal);
+            }
+          });
+
+          document.body.appendChild(modal);
+        } catch (error) {
+          console.error('处理数字标签点击时出错:', error);
+          Toast.show('处理点击时出错', 2000);
+        }
+      } else {
+        // 检查是否是生肖
+        const zodiac = text;
+        const zodiacNumbers = [];
+        
+        // 获取该生肖对应的所有数字
+        for(let num = 1; num <= 49; num++) {
+          const attrs = DataQuery.getNumAttrs(num);
+          if(attrs.zodiac === zodiac) {
+            zodiacNumbers.push(num);
+          }
+        }
+        
+        if(zodiacNumbers.length > 0) {
+          // 创建弹窗显示生肖对应的数字
+          const modal = document.createElement('div');
+          modal.style.cssText = `
+            position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:9999;
+            display:flex; align-items:center; justify-content:center;
+          `;
+
+          const content = document.createElement('div');
+          content.style.cssText = `
+            background:var(--card); border-radius:12px; width:90%; max-width:500px; max-height:80vh;
+            overflow-y:auto; box-shadow:0 4px 12px rgba(0,0,0,0.2);
+          `;
+
+          // 生成数字球的HTML
+          let ballsHtml = `<div style="padding:20px;">
+            <h3 style="margin-top:0; color:var(--primary); text-align:center;">生肖：${zodiac}</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:20px 0;">`;
+          
+          zodiacNumbers.forEach(num => {
+            const attrs = DataQuery.getNumAttrs(num);
+            const color = attrs.color;
+            const element = attrs.element;
+            const colorClass = color === '红' ? 'red' : color === '蓝' ? 'blue' : 'green';
+            
+            ballsHtml += `<div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+                <div class="ball ${colorClass}" style="width:40px; height:40px; font-size:16px; display:flex; align-items:center; justify-content:center;">${String(num).padStart(2, '0')}</div>
+                <div style="font-size:12px; color:var(--text); text-align:center;">${element}</div>
+              </div>`;
+          });
+          
+          ballsHtml += '</div></div>';
+
+          const closeBtn = document.createElement('button');
+          closeBtn.innerText = '关闭';
+          closeBtn.style.cssText = `
+            display:block; width:100%; padding:14px; background:var(--primary); color:white;
+            border:none; border-radius:0 0 12px 12px; cursor:pointer; font-size:15px;
+          `;
+
+          content.innerHTML = ballsHtml;
+          content.appendChild(closeBtn);
+          modal.appendChild(content);
+
+          // 关闭事件
+          closeBtn.addEventListener('click', () => {
+            document.body.removeChild(modal);
+          });
+
+          modal.addEventListener('click', (e) => {
+            if(e.target === modal) {
+              document.body.removeChild(modal);
+            }
+          });
+
+          document.body.appendChild(modal);
+        } else {
+          Toast.show('未找到该生肖对应的数字', 2000);
+        }
+      }
+      return;
+    }
 
     // 11. 可展开/折叠的span和div元素
     const collapsibleElement = target.closest('[data-toggle-target]');

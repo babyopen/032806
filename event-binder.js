@@ -278,29 +278,39 @@ const EventBinder = {
   bindNumberTagEvents() {
     // 为所有数字标签添加点击事件
     document.addEventListener('click', (e) => {
+      console.log('点击事件触发，目标:', e.target);
       const numberTag = e.target.closest('.number-tag');
+      console.log('找到的number-tag:', numberTag);
       if(numberTag) {
         const number = numberTag.innerText.trim();
+        console.log('号码:', number);
         if(number && !isNaN(number)) {
-          // 获取号码信息
-          const num = parseInt(number);
-          const attrs = DataQuery.getNumAttrs(num);
-          
-          // 获取颜色
-          const color = attrs.color;
-          const colorMap = { '红': 'red', '蓝': 'blue', '绿': 'green' };
-          const colorClass = colorMap[color] || 'red';
-          
-          // 显示提示
-          Toast.show(`${number} - ${attrs.zodiac} - ${attrs.element}`, 2000);
-          
-          // 设置提示颜色
-          const toast = document.getElementById('toast');
-          if(toast) {
-            toast.style.color = color === '红' ? '#ff0000' : color === '蓝' ? '#0000ff' : '#00ff00';
-            setTimeout(() => {
-              toast.style.color = '';
-            }, 2000);
+          try {
+            // 获取号码信息
+            const num = parseInt(number);
+            console.log('解析后的号码:', num);
+            const attrs = DataQuery.getNumAttrs(num);
+            console.log('号码属性:', attrs);
+            
+            // 获取颜色
+            const color = attrs.color;
+            console.log('颜色:', color);
+            
+            // 显示提示
+            Toast.show(`${number} - ${attrs.zodiac} - ${attrs.element}`, 2000);
+            console.log('显示提示:', `${number} - ${attrs.zodiac} - ${attrs.element}`);
+            
+            // 设置提示颜色
+            const toast = document.getElementById('toast');
+            if(toast) {
+              toast.style.color = color === '红' ? '#ff0000' : color === '蓝' ? '#0000ff' : '#00ff00';
+              setTimeout(() => {
+                toast.style.color = '';
+              }, 2000);
+            }
+          } catch (error) {
+            console.error('处理数字标签点击时出错:', error);
+            Toast.show('处理点击时出错', 2000);
           }
         }
       }
