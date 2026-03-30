@@ -6049,16 +6049,21 @@ const Business = {
         }
         
         html += `
-          <div style="padding:12px;border-bottom:1px solid var(--border);background:var(--card);border-radius:8px;margin-bottom:10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <div style="color:var(--sub-text);font-size:11px;">
-                <span>${titleText}</span>
+          <div class="special-history-item" data-index="${idx}" style="padding:12px;border-bottom:1px solid var(--border);background:var(--card);border-radius:8px;margin-bottom:10px;position:relative;overflow:hidden;" ontouchstart="Business.handleSpecialHistoryTouchStart(event, ${idx})" ontouchmove="Business.handleSpecialHistoryTouchMove(event, ${idx})" ontouchend="Business.handleSpecialHistoryTouchEnd(event, ${idx})">
+            <div class="special-history-content" style="transition:transform 0.3s ease;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="color:var(--sub-text);font-size:11px;">
+                  <span>${titleText}</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:8px;">
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">${numbersHtml}${drawNumberHtml}</div>
+                </div>
               </div>
             </div>
-            <div style="display:flex;align-items:flex-start;gap:8px;">
-              <div style="flex:1;min-width:0;">
-                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">${numbersHtml}${drawNumberHtml}</div>
-              </div>
+            <div class="special-history-delete" style="position:absolute;right:0;top:0;bottom:0;width:80px;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;transform:translateX(100%);transition:transform 0.3s ease;cursor:pointer;" onclick="Business.deleteSpecialHistoryItem(${idx})">
+              删除
             </div>
           </div>
         `;
@@ -6106,6 +6111,150 @@ const Business = {
     StateManager.setState({ specialHistory: [] }, false);
     Business.renderSpecialHistory();
     Toast.show('已清空');
+  },
+
+  // 精选特码历史左滑删除相关变量
+  _specialHistoryTouchStartX: {},
+  _specialHistoryTouchCurrentX: {},
+  _specialHistoryDeleteThreshold: -80, // 滑动超过80px显示删除按钮
+
+  /**
+   * 精选特码历史触摸开始
+   */
+  handleSpecialHistoryTouchStart: (e, idx) => {
+    Business._specialHistoryTouchStartX[idx] = e.touches[0].clientX;
+    Business._specialHistoryTouchCurrentX[idx] = e.touches[0].clientX;
+  },
+
+  /**
+   * 精选特码历史触摸移动
+   */
+  handleSpecialHistoryTouchMove: (e, idx) => {
+    if(Business._specialHistoryTouchStartX[idx] === undefined) return;
+    
+    const currentX = e.touches[0].clientX;
+    Business._specialHistoryTouchCurrentX[idx] = currentX;
+    
+    const deltaX = currentX - Business._specialHistoryTouchStartX[idx];
+    const item = e.currentTarget;
+    const content = item.querySelector('.special-history-content');
+    const deleteBtn = item.querySelector('.special-history-delete');
+    
+    // 只允许向左滑动
+    if(deltaX < 0 && deltaX > Business._specialHistoryDeleteThreshold) {
+      content.style.transform = `translateX(${deltaX}px)`;
+      deleteBtn.style.transform = `translateX(${100 + deltaX / Business._specialHistoryDeleteThreshold * 100}%)`;
+    } else if(deltaX <= Business._specialHistoryDeleteThreshold) {
+      content.style.transform = `translateX(${Business._specialHistoryDeleteThreshold}px)`;
+      deleteBtn.style.transform = 'translateX(0)';
+    }
+  },
+
+  /**
+   * 精选特码历史触摸结束
+   */
+  handleSpecialHistoryTouchEnd: (e, idx) => {
+    const item = e.currentTarget;
+    const content = item.querySelector('.special-history-content');
+    const deleteBtn = item.querySelector('.special-history-delete');
+    
+    const deltaX = Business._specialHistoryTouchCurrentX[idx] - Business._specialHistoryTouchStartX[idx];
+    
+    // 判断是否显示删除按钮
+    if(deltaX <= Business._specialHistoryDeleteThreshold / 2) {
+      // 显示删除按钮
+      content.style.transform = `translateX(${Business._specialHistoryDeleteThreshold}px)`;
+      deleteBtn.style.transform = 'translateX(0)';
+    } else {
+      // 恢复原位
+      content.style.transform = 'translateX(0)';
+      deleteBtn.style.transform = 'translateX(100%)';
+    }
+    
+    // 清理
+    delete Business._specialHistoryTouchStartX[idx];
+    delete Business._specialHistoryTouchCurrentX[idx];
+  },
+
+  /**
+   * 删除精选特码历史单条记录
+   */
+  deleteSpecialHistoryItem: (displayIdx) => {
+    try {
+      const state = StateManager._state;
+      const history = state.specialHistory || [];
+      
+      if(displayIdx < 0 || displayIdx >= history.length) {
+        Toast.show('删除失败：记录不存在');
+        return;
+      }
+      
+      // 获取当前筛选状态
+      const show10Period = document.querySelector('.special-period-btn[data-period="10"]')?.classList.contains('active') ?? true;
+      const show20Period = document.querySelector('.special-period-btn[data-period="20"]')?.classList.contains('active') ?? false;
+      const show30Period = document.querySelector('.special-period-btn[data-period="30"]')?.classList.contains('active') ?? false;
+      const showAllPeriod = document.querySelector('.special-period-btn[data-period="all"]')?.classList.contains('active') ?? false;
+      const show5Num = document.querySelector('.special-num-btn[data-num="5"]')?.classList.contains('active') ?? true;
+      const show10Num = document.querySelector('.special-num-btn[data-num="10"]')?.classList.contains('active') ?? false;
+      const show15Num = document.querySelector('.special-num-btn[data-num="15"]')?.classList.contains('active') ?? false;
+      const show20Num = document.querySelector('.special-num-btn[data-num="20"]')?.classList.contains('active') ?? false;
+      
+      // 根据勾选状态筛选历史记录，找到对应的实际索引
+      const filteredHistory = history.filter(item => {
+        const period = item.analyzeLimit;
+        const periodText = item.selectedPeriodText || '';
+        const numCount = item.numCount || item.numbers.length;
+        
+        let periodMatch = false;
+        if(show10Period && (period === 10 || periodText.includes('10期'))) periodMatch = true;
+        if(show20Period && (period === 20 || periodText.includes('20期'))) periodMatch = true;
+        if(show30Period && (period === 30 || periodText.includes('30期'))) periodMatch = true;
+        if(showAllPeriod && periodText.includes('全年')) periodMatch = true;
+        
+        let numMatch = false;
+        if(show5Num && numCount === 5) numMatch = true;
+        if(show10Num && numCount === 10) numMatch = true;
+        if(show15Num && numCount === 15) numMatch = true;
+        if(show20Num && numCount === 20) numMatch = true;
+        
+        return periodMatch && numMatch;
+      });
+      
+      const isExpanded = state.specialHistoryExpanded || false;
+      const displayCount = isExpanded ? filteredHistory.length : Math.min(4, filteredHistory.length);
+      const displayHistory = filteredHistory.slice(0, displayCount);
+      
+      if(displayIdx < 0 || displayIdx >= displayHistory.length) {
+        Toast.show('删除失败：记录不存在');
+        return;
+      }
+      
+      // 找到要删除的记录
+      const itemToDelete = displayHistory[displayIdx];
+      
+      // 从原始历史记录中删除
+      const actualIdx = history.findIndex(h => 
+        h.timestamp === itemToDelete.timestamp && 
+        h.expect === itemToDelete.expect &&
+        JSON.stringify(h.numbers) === JSON.stringify(itemToDelete.numbers)
+      );
+      
+      if(actualIdx === -1) {
+        Toast.show('删除失败：记录不存在');
+        return;
+      }
+      
+      history.splice(actualIdx, 1);
+      
+      // 保存并重新渲染
+      Storage.saveSpecialHistory(history);
+      StateManager.setState({ specialHistory: history }, false);
+      Business.renderSpecialHistory();
+      Toast.show('已删除');
+    } catch(e) {
+      console.error('删除精选特码历史记录失败', e);
+      Toast.show('删除失败');
+    }
   },
 
   /**
