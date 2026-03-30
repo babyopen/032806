@@ -366,14 +366,16 @@
       </div>
       <div class="card-body">
         <div id="predictionFiltersPanel" class="filter-panel">
-          <div class="filter-panel-row">
-            <div class="filter-btn-group">
+          <div class="filter-panel-row" style="flex-direction:column;align-items:stretch;">
+            <!-- 第一排：10期/20期/30期/全年 -->
+            <div style="display:flex;gap:4px;justify-content:flex-start;">
               <button class="btn-mini prediction-period-btn active" data-period="10">10期</button>
               <button class="btn-mini prediction-period-btn" data-period="20">20期</button>
               <button class="btn-mini prediction-period-btn" data-period="30">30期</button>
               <button class="btn-mini prediction-period-btn" data-period="all">全年</button>
             </div>
-            <div class="filter-panel-buttons">
+            <!-- 第二排：全选/清空/确认 -->
+            <div style="display:flex;gap:4px;justify-content:flex-end;margin-top:4px;">
               <button class="btn-mini" data-action="selectAllPredictionPeriods">全选</button>
               <button class="btn-mini" data-action="resetPredictionPeriods">清空</button>
               <button class="btn-mini" data-action="confirmPredictionFilters" style="background:var(--primary);color:#fff;">确认</button>
@@ -398,25 +400,27 @@
       </div>
       <div class="card-body">
         <div id="specialFiltersPanel" class="filter-panel">
-          <div class="filter-panel-row">
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <div class="filter-btn-group">
-                <button class="btn-mini special-period-btn active" data-period="10">10期</button>
-                <button class="btn-mini special-period-btn" data-period="20">20期</button>
-                <button class="btn-mini special-period-btn" data-period="30">30期</button>
-                <button class="btn-mini special-period-btn" data-period="all">全年</button>
-              </div>
-              <div class="filter-btn-group">
+          <div class="filter-panel-row" style="flex-direction:column;align-items:stretch;">
+            <!-- 第一排：10期/20期/30期/全年 -->
+            <div style="display:flex;gap:4px;justify-content:flex-start;">
+              <button class="btn-mini special-period-btn active" data-period="10">10期</button>
+              <button class="btn-mini special-period-btn" data-period="20">20期</button>
+              <button class="btn-mini special-period-btn" data-period="30">30期</button>
+              <button class="btn-mini special-period-btn" data-period="all">全年</button>
+            </div>
+            <!-- 第二排：5个/10个/15个/20个 + 全选/清空/确认 -->
+            <div style="display:flex;gap:4px;justify-content:space-between;margin-top:4px;">
+              <div style="display:flex;gap:4px;">
                 <button class="btn-mini special-num-btn active" data-num="5">5个</button>
                 <button class="btn-mini special-num-btn" data-num="10">10个</button>
                 <button class="btn-mini special-num-btn" data-num="15">15个</button>
                 <button class="btn-mini special-num-btn" data-num="20">20个</button>
               </div>
-            </div>
-            <div class="filter-panel-buttons">
-              <button class="btn-mini" data-action="selectAllSpecialFilters">全选</button>
-              <button class="btn-mini" data-action="resetSpecialFilters">清空</button>
-              <button class="btn-mini" data-action="confirmSpecialFilters" style="background:var(--primary);color:#fff;">确认</button>
+              <div style="display:flex;gap:4px;">
+                <button class="btn-mini" data-action="selectAllSpecialFilters">全选</button>
+                <button class="btn-mini" data-action="resetSpecialFilters">清空</button>
+                <button class="btn-mini" data-action="confirmSpecialFilters" style="background:var(--primary);color:#fff;">确认</button>
+              </div>
             </div>
           </div>
         </div>
