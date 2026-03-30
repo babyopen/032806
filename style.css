@@ -1692,3 +1692,47 @@ input[type="checkbox"]{
     padding: 1px 4px;
   }
 }
+
+/* ====================== 精选特码模式切换按钮样式 ====================== */
+.mode-switch-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-btn {
+  min-width: 32px !important;
+  width: 32px !important;
+  height: 32px !important;
+  padding: 0 !important;
+  font-size: 16px !important;
+  border-radius: 8px !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border) !important;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.mode-btn.active {
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mode-btn[data-mode="hot"].active {
+  background: linear-gradient(135deg, #ff6b35, #f7931e) !important;
+  border-color: #ff6b35 !important;
+}
+
+.mode-btn[data-mode="cold"].active {
+  background: linear-gradient(135deg, #00d2ff, #3a7bd5) !important;
+  border-color: #00d2ff !important;
+}
+
+.mode-btn[data-mode="auto"].active {
+  background: linear-gradient(135deg, #11998e, #38ef7d) !important;
+  border-color: #11998e !important;
+}
+
+.mode-btn:active {
+  transform: scale(0.95);
+}
