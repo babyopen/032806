@@ -628,5 +628,33 @@ const Business = {
   copyZodiacNumbers: () => {
     const numbers = Business.extractNumbersFromBalls('zodiacFinalNumContent', '暂无精选特码可复制');
     if(numbers) Business.copyToClipboard(numbers);
+  },
+
+  /**
+   * 切换标签页
+   * @param {string} tabName - 标签名
+   */
+  switchTab: (tabName) => {
+    // 根据标签名切换到对应的页面
+    switch(tabName) {
+      case 'prediction':
+        // 切换到预测历史页面
+        Business.switchBottomNav(3);
+        break;
+      case 'lottery':
+        // 切换到机选页面
+        Business.switchBottomNav(2);
+        break;
+      case 'filter':
+        // 切换到筛选页面
+        Business.switchBottomNav(0);
+        break;
+      case 'analysis':
+        // 切换到分析页面
+        Business.switchBottomNav(1);
+        break;
+      default:
+        break;
+    }
   }
 };
