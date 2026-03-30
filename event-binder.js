@@ -14,6 +14,7 @@ const EventBinder = {
     this.bindSpecialHistoryEvents();
     this.bindAnalysisEvents();
     this.bindLotteryEvents();
+    this.bindNumberTagEvents();
   },
 
   /**
@@ -269,6 +270,41 @@ const EventBinder = {
         });
       }
     }
+  },
+
+  /**
+   * 绑定数字标签点击事件
+   */
+  bindNumberTagEvents() {
+    // 为所有数字标签添加点击事件
+    document.addEventListener('click', (e) => {
+      const numberTag = e.target.closest('.number-tag');
+      if(numberTag) {
+        const number = numberTag.innerText.trim();
+        if(number && !isNaN(number)) {
+          // 获取号码信息
+          const num = parseInt(number);
+          const attrs = DataQuery.getNumAttrs(num);
+          
+          // 获取颜色
+          const color = attrs.color;
+          const colorMap = { '红': 'red', '蓝': 'blue', '绿': 'green' };
+          const colorClass = colorMap[color] || 'red';
+          
+          // 显示提示
+          Toast.show(`${number} - ${attrs.zodiac} - ${attrs.element}`, 2000);
+          
+          // 设置提示颜色
+          const toast = document.getElementById('toast');
+          if(toast) {
+            toast.style.color = color === '红' ? '#ff0000' : color === '蓝' ? '#0000ff' : '#00ff00';
+            setTimeout(() => {
+              toast.style.color = '';
+            }, 2000);
+          }
+        }
+      }
+    });
   },
 
   /**
