@@ -2188,8 +2188,8 @@ const Business = {
 
     // 生肖预测
     const zodiacPredictionGrid = document.getElementById('zodiacPredictionGrid');
-    console.log('zodiacPredictionGrid:', zodiacPredictionGrid);
-    console.log('data.sortedZodiacs:', data.sortedZodiacs);
+    // console.log('zodiacPredictionGrid:', zodiacPredictionGrid);
+    // console.log('data.sortedZodiacs:', data.sortedZodiacs);
     if(zodiacPredictionGrid && data.sortedZodiacs) {
       let predictionHtml = '';
       data.sortedZodiacs.forEach(([zod, score], idx) => {
@@ -2218,7 +2218,7 @@ const Business = {
           </div>
         `;
       });
-      console.log('predictionHtml:', predictionHtml);
+      // console.log('predictionHtml:', predictionHtml);
       zodiacPredictionGrid.innerHTML = predictionHtml;
     }
 
@@ -2614,12 +2614,12 @@ const Business = {
    * @param {string} targetId - 模块ID
    */
   scrollToModule: (targetId) => {
-    console.log('scrollToModule called with targetId:', targetId);
+    // console.log('scrollToModule called with targetId:', targetId);
     const targetEl = document.getElementById(targetId);
-    console.log('targetEl:', targetEl);
+    // console.log('targetEl:', targetEl);
     if(targetEl){
       const offset = CONFIG.TOP_OFFSET + Utils.getSafeTop();
-      console.log('offset:', offset, 'targetEl.offsetTop:', targetEl.offsetTop);
+      // console.log('offset:', offset, 'targetEl.offsetTop:', targetEl.offsetTop);
       window.scrollTo({top: targetEl.offsetTop - offset, behavior: 'smooth'});
     }
     Business.toggleQuickNav(false);
@@ -2657,15 +2657,15 @@ const Business = {
    * 滚动事件处理（已节流优化）
    */
   handleScroll: Utils.throttle(() => {
-    console.log('handleScroll called');
+    // console.log('handleScroll called');
     const state = StateManager._state;
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    console.log('scrollTop:', scrollTop, 'threshold:', CONFIG.BACK_TOP_THRESHOLD);
+    // console.log('scrollTop:', scrollTop, 'threshold:', CONFIG.BACK_TOP_THRESHOLD);
     clearTimeout(state.scrollTimer);
 
     // 显示/隐藏返回顶部按钮
     if(scrollTop > CONFIG.BACK_TOP_THRESHOLD){
-      console.log('Showing back to top button');
+      // console.log('Showing back to top button');
       DOM.backTopBtn.classList.add('show');
       // 滚动停止后延迟隐藏
       state.scrollTimer = setTimeout(() => {
@@ -2870,7 +2870,7 @@ const EventBinder = {
    */
   handleGlobalClick: (e) => {
     const target = e.target;
-    console.log('handleGlobalClick called, target:', target.className);
+    // console.log('handleGlobalClick called, target:', target.className);
 
     // 1. 筛选标签点击
     const tag = target.closest('.tag[data-group]');
@@ -2890,10 +2890,10 @@ const EventBinder = {
 
     // 3. 快捷导航跳转
     const navTab = target.closest('.nav-tab[data-target]');
-    console.log('navTab:', navTab);
+    // console.log('navTab:', navTab);
     if(navTab){
       const targetId = navTab.dataset.target;
-      console.log('Navigating to:', targetId);
+      // console.log('Navigating to:', targetId);
       Business.scrollToModule(targetId);
       return;
     }
@@ -2965,14 +2965,14 @@ const EventBinder = {
     }
 
     // 9. 生肖预测项点击
-    console.log('Checking zodiac prediction item click...');
-    console.log('target:', target);
-    console.log('target.className:', target.className);
+    // console.log('Checking zodiac prediction item click...');
+    // console.log('target:', target);
+    // console.log('target.className:', target.className);
     const zodiacItem = target.closest('.zodiac-prediction-item[data-zodiac]');
-    console.log('zodiacItem:', zodiacItem);
+    // console.log('zodiacItem:', zodiacItem);
     if(zodiacItem){
       const zodiac = zodiacItem.dataset.zodiac;
-      console.log('zodiac:', zodiac);
+      // console.log('zodiac:', zodiac);
       Business.showZodiacDetail(zodiac);
       return;
     }
@@ -3044,7 +3044,7 @@ async function initApp() {
     // 10. 隐藏加载遮罩
     Render.hideLoading();
     
-    console.log(`小摇筛选 v${CONFIG.VERSION} 初始化完成，当前农历生肖：${StateManager._state.currentZodiac}`);
+    // console.log(`小摇筛选 v${CONFIG.VERSION} 初始化完成，当前农历生肖：${StateManager._state.currentZodiac}`);
   } catch(e) {
     console.error('应用初始化失败', e);
     Toast.show('页面初始化失败，请刷新重试');

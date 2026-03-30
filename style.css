@@ -277,34 +277,7 @@ body{
   margin-right:auto;
 }
 
-/* 小按钮 */
-.btn-mini{
-  padding:6px 10px;
-  font-size:12px;
-  border:none;
-  border-radius:var(--radius-sm);
-  background:var(--bg-secondary);
-  color:var(--primary);
-  cursor:pointer;
-  transition:opacity var(--anim-fast);
-  touch-action:manipulation;
-  -webkit-user-select:none;
-  user-select:none;
-}
-
-.btn-mini:active{
-  opacity:0.6;
-}
-
-.btn-mini.red{
-  background:rgba(255,59,48,0.1);
-  color:var(--danger);
-}
-
-.btn-mini.active{
-  background:var(--primary);
-  color:#FFFFFF;
-}
+/* 小按钮 - 样式已在前面定义 */
 
 /* 未被选中的标签添加底色 */
 .btn-mini:not(.active){
