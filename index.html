@@ -1838,7 +1838,7 @@ input[type="checkbox"]{
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：v26.3.05.1</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：V26.03.6</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -6373,7 +6373,7 @@ const Business = {
           const isMatchZodiac = actualZodiac && p.zodiac === actualZodiac;
           const zodiacBg = isMatchZodiac ? 'var(--primary)' : 'var(--bg-secondary)';
           const zodiacColor = isMatchZodiac ? '#fff' : 'var(--text)';
-          return `<span style="display:inline-block;margin:2px;padding:4px 8px;background:${zodiacBg};color:${zodiacColor};border-radius:6px;font-size:13px;">${p.zodiac}</span>`;
+          return `<span style="display:inline-flex;justify-content:center;align-items:center;padding:4px 8px;background:${zodiacBg};color:${zodiacColor};border-radius:6px;font-size:13px;border:1px solid var(--border);white-space:nowrap;">${p.zodiac}</span>`;
         }).join('');
         
         let titleText = '';
