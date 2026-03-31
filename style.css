@@ -1660,6 +1660,83 @@ input[type="checkbox"]{
   }
 }
 
+/* 精选生肖模块 */
+.selected-zodiacs {
+  margin-bottom: 16px;
+}
+
+.selected-zodiacs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.selected-zodiac-item {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.selected-zodiac-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.selected-zodiac-item .zodiac-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.selected-zodiac-item .zodiac-periods {
+  font-size: 10px;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.selected-zodiac-period-tag {
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 9px;
+  background: rgba(0,0,0,0.1);
+}
+
+@media (max-width: 480px) {
+  .selected-zodiacs-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  
+  .selected-zodiac-item .zodiac-name {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .selected-zodiacs-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+  }
+  
+  .selected-zodiac-item {
+    padding: 8px 4px;
+  }
+  
+  .selected-zodiac-item .zodiac-name {
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 360px) {
   .zodiac-prediction-grid {
     grid-template-columns: repeat(3, 1fr);
