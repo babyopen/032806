@@ -1876,30 +1876,6 @@ const Render = {
   },
 
   /**
-   * 获取当前农历年份
-   * @returns {number} 农历年份
-   */
-  getCurrentLunarYear: () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const thisYearSpring = new Date(CONFIG.SPRING_FESTIVAL[year]);
-    return now < thisYearSpring ? year - 1 : year;
-  },
-
-  /**
-   * 获取指定日期的农历年份
-   * @param {string} dateStr - 日期字符串 (格式: YYYY-MM-DD)
-   * @returns {number} 农历年份
-   */
-  getLunarYearByDate: (dateStr) => {
-    if(!dateStr) return Business.getCurrentLunarYear();
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const thisYearSpring = new Date(CONFIG.SPRING_FESTIVAL[year]);
-    return date < thisYearSpring ? year - 1 : year;
-  },
-
-  /**
    * 生成生肖循环
    * @returns {Object} 生肖信息
    */
@@ -2023,6 +1999,31 @@ const Filter = {
  * @namespace Business
  */
 const Business = {
+  // ====================== 农历年份相关 ======================
+  /**
+   * 获取当前农历年份
+   * @returns {number} 农历年份
+   */
+  getCurrentLunarYear: () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const thisYearSpring = new Date(CONFIG.SPRING_FESTIVAL[year]);
+    return now < thisYearSpring ? year - 1 : year;
+  },
+
+  /**
+   * 获取指定日期的农历年份
+   * @param {string} dateStr - 日期字符串 (格式: YYYY-MM-DD)
+   * @returns {number} 农历年份
+   */
+  getLunarYearByDate: (dateStr) => {
+    if(!dateStr) return Business.getCurrentLunarYear();
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const thisYearSpring = new Date(CONFIG.SPRING_FESTIVAL[year]);
+    return date < thisYearSpring ? year - 1 : year;
+  },
+
   // ====================== 排除号码相关 ======================
   /**
    * 切换号码排除状态
