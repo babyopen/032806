@@ -7609,7 +7609,7 @@ const EventBinder = {
       <div class="zodiac-detail-modal" role="dialog" aria-modal="true" aria-labelledby="zodiac-detail-title">
         <div class="zodiac-detail-header">
           <h3 id="zodiac-detail-title" class="zodiac-detail-title">${zodiac} - 详细分析</h3>
-          <button class="zodiac-detail-close" aria-label="关闭详情" onclick="this.closest('.zodiac-detail-modal').remove()">&times;</button>
+          <button class="zodiac-detail-close" aria-label="关闭详情">&times;</button>
         </div>
         <div class="zodiac-detail-content">
     `;
@@ -7678,9 +7678,16 @@ const EventBinder = {
     };
     document.addEventListener('keydown', escHandler);
     
-    // 聚焦到关闭按钮
+    // 聚焦到关闭按钮并添加事件监听器
     const closeBtn = modalContainer.querySelector('.zodiac-detail-close');
-    if(closeBtn) closeBtn.focus();
+    if(closeBtn) {
+      closeBtn.focus();
+      // 点击关闭按钮关闭模态框
+      closeBtn.addEventListener('click', () => {
+        modalContainer.remove();
+        document.removeEventListener('keydown', escHandler);
+      });
+    }
   }
 };
 
