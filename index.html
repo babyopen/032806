@@ -6495,6 +6495,23 @@ const Business = {
       const modeFilter = state.specialHistoryModeFilter || 'all';
       // 获取当前系统模式
       const currentMode = state.analysis.specialMode || 'hot';
+      const isAutoMode = currentMode === 'auto';
+      
+      // 预计算不同期数的自动模式决策结果，避免重复计算
+      const autoModeDecisions = new Map();
+      if(isAutoMode) {
+        // 收集所有唯一的期数
+        const uniquePeriods = new Set();
+        history.forEach(item => uniquePeriods.add(item.analyzeLimit));
+        
+        // 为每个期数计算自动模式决策
+        uniquePeriods.forEach(period => {
+          const data = Business.calcZodiacAnalysis(period);
+          if(data && data.sortedZodiacs && data.sortedZodiacs.length > 0) {
+            autoModeDecisions.set(period, Business.decideAutoMode(data));
+          }
+        });
+      }
       
       // 根据勾选状态筛选历史记录
       const filteredHistory = history.filter(item => {
@@ -6518,13 +6535,10 @@ const Business = {
         // 模式筛选
         let modeMatch = false;
         if(modeFilter === 'all') {
-          if(currentMode === 'auto') {
+          if(isAutoMode) {
             // 当系统处于自动模式时，默认只显示与自动模式决策结果匹配的记录
-            const data = Business.calcZodiacAnalysis(item.analyzeLimit);
-            if(data && data.sortedZodiacs && data.sortedZodiacs.length > 0) {
-              const autoModeDecision = Business.decideAutoMode(data);
-              modeMatch = autoModeDecision === itemMode;
-            }
+            const autoModeDecision = autoModeDecisions.get(period);
+            modeMatch = autoModeDecision === itemMode;
           } else {
             // 非自动模式：显示所有模式的数据
             modeMatch = true;
@@ -6545,26 +6559,16 @@ const Business = {
       
       let html = '';
       displayHistory.forEach((item, idx) => {
-        const periodText = item.selectedPeriodText || (item.analyzeLimit >= 365 ? '全年数据' : `${item.analyzeLimit}期数据`);
+        const period = item.analyzeLimit;
+        const periodText = item.selectedPeriodText || (period >= 365 ? '全年数据' : `${period}期数据`);
         const numCount = item.numCount || item.numbers.length;
         const itemMode = item.mode || 'hot'; // 获取模式，默认为热号模式
         
         // 生成模式标签
         const modeEmoji = itemMode === 'hot' ? '🔥' : itemMode === 'cold' ? '❄️' : '🔥';
         
-        // 检查当前系统是否处于自动模式
-        const currentMode = state.analysis.specialMode || 'hot';
-        const isAutoMode = currentMode === 'auto';
-        
         // 获取当前自动模式的决策结果
-        let autoModeDecision = null;
-        if(isAutoMode) {
-          // 计算分析数据以获取自动模式决策
-          const data = Business.calcZodiacAnalysis(item.analyzeLimit);
-          if(data && data.sortedZodiacs && data.sortedZodiacs.length > 0) {
-            autoModeDecision = Business.decideAutoMode(data);
-          }
-        }
+        const autoModeDecision = autoModeDecisions.get(period);
         
         // 生成标题
         let titleText = '';
