@@ -6493,6 +6493,8 @@ const Business = {
       
       // 获取当前模式筛选
       const modeFilter = state.specialHistoryModeFilter || 'all';
+      // 获取当前系统模式
+      const currentMode = state.analysis.specialMode || 'hot';
       
       // 根据勾选状态筛选历史记录
       const filteredHistory = history.filter(item => {
@@ -6516,10 +6518,19 @@ const Business = {
         // 模式筛选
         let modeMatch = false;
         if(modeFilter === 'all') {
-          // 全部模式：显示所有模式的数据
-          modeMatch = true;
+          if(currentMode === 'auto') {
+            // 当系统处于自动模式时，默认只显示与自动模式决策结果匹配的记录
+            const data = Business.calcZodiacAnalysis(item.analyzeLimit);
+            if(data && data.sortedZodiacs && data.sortedZodiacs.length > 0) {
+              const autoModeDecision = Business.decideAutoMode(data);
+              modeMatch = autoModeDecision === itemMode;
+            }
+          } else {
+            // 非自动模式：显示所有模式的数据
+            modeMatch = true;
+          }
         } else if(modeFilter === 'auto') {
-          // 自动模式：显示所有模式的数据（因为自动模式最终会转换为热号或冷号）
+          // 自动模式筛选：显示所有模式的数据
           modeMatch = true;
         } else if(modeFilter === itemMode) {
           // 特定模式：只显示对应模式的数据
