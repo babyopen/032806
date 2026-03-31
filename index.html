@@ -713,7 +713,7 @@
             <div class="final-recommend-z" id="zodiacFinalNum" style="position:relative;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
                 <span>✅ 精选特码：</span>
-                <div style="display:flex;gap:8px;align-items:center;">
+                <div style="display:flex;gap:8px;align-items:center;margin-left:auto;">
                   <!-- 模式切换按钮组 -->
                   <div class="mode-switch-btns" style="display:flex;gap:4px;margin-right:8px;">
                     <button class="btn-mini mode-btn active" data-mode="hot" data-action="switchSpecialMode" title="🔥 热号模式">🔥</button>
@@ -5801,9 +5801,22 @@ const Business = {
    */
   setButtonGroupState: (selector, activeValues, dataAttr = 'data-value') => {
     const buttons = document.querySelectorAll(selector);
+    
+    // 对于单选按钮组，只取第一个激活值
+    let finalActiveValues = activeValues;
+    if (selector === '.special-period-btn' || selector === '.special-num-btn') {
+      if (activeValues && activeValues.length > 0) {
+        finalActiveValues = [activeValues[0]];
+      }
+    }
+    // 预测历史期数按钮允许多选
+    if (selector === '.prediction-period-btn') {
+      finalActiveValues = activeValues;
+    }
+    
     buttons.forEach(btn => {
       const value = btn.getAttribute(dataAttr);
-      if(activeValues.includes(value)) {
+      if(finalActiveValues.includes(value)) {
         btn.classList.add('active');
         btn.style.background = 'var(--primary)';
         btn.style.color = '#fff';
@@ -5832,6 +5845,33 @@ const Business = {
       btn.style.color = '#fff';
     }
     return !isActive;
+  },
+
+  /**
+   * 切换单选按钮组状态（同一组内只能选择一个）
+   * @param {HTMLElement} btn - 被点击的按钮元素
+   * @param {string} groupSelector - 按钮组选择器
+   */
+  toggleRadioButtonGroup: (btn, groupSelector) => {
+    // 如果点击的按钮已经是激活状态，保持选中（单选模式下不允许取消）
+    if (btn.classList.contains('active')) {
+      return;
+    }
+    
+    // 获取同组的所有按钮
+    const buttons = document.querySelectorAll(groupSelector);
+    
+    // 先取消所有同组按钮的选中状态
+    buttons.forEach(otherBtn => {
+      otherBtn.classList.remove('active');
+      otherBtn.style.background = '';
+      otherBtn.style.color = '';
+    });
+    
+    // 选中当前点击的按钮
+    btn.classList.add('active');
+    btn.style.background = 'var(--primary)';
+    btn.style.color = '#fff';
   },
 
   /**
@@ -5983,7 +6023,19 @@ const Business = {
     }
     
     // 获取当前模式
-    const specialMode = state.analysis.specialMode || 'hot';
+    let specialMode = state.analysis.specialMode || 'hot';
+    let actualMode = specialMode;
+    
+    // 处理自动模式：使用实际生效的模式
+    if(specialMode === 'auto') {
+      // 获取分析数据
+      const analysisData = Business.calcZodiacAnalysis(analyzeLimit);
+      if(analysisData && analysisData.sortedZodiacs) {
+        // 计算自动模式决策
+        const modeDecision = Business.decideAutoMode(analysisData);
+        actualMode = modeDecision; // 使用决策结果作为实际模式
+      }
+    }
     
     // 创建历史记录
     const historyItem = {
@@ -6000,8 +6052,22 @@ const Business = {
       drawResult: null, // 后续开奖的结果
       hitNumbers: [], // 命中的号码
       hitCount: 0, // 命中数量
-      mode: specialMode // 记录生成时使用的模式：'hot' | 'cold' | 'auto'
+      mode: actualMode // 记录实际生效的模式：'hot' | 'cold'
     };
+    
+    // 检查是否已存在相同的历史记录（根据号码、期数和模式判断）
+    const isDuplicate = state.specialHistory.some(item => 
+      item.numbers && 
+      item.numbers.length === numbers.length && 
+      item.numbers.every((n, i) => n === numbers[i]) &&
+      item.analyzeLimit === analyzeLimit &&
+      item.mode === specialMode
+    );
+    
+    if(isDuplicate) {
+      // 已存在相同记录，不添加
+      return;
+    }
     
     // 添加到历史记录
     const newHistory = [historyItem, ...state.specialHistory];
@@ -6070,20 +6136,9 @@ const Business = {
         
         // 遍历所有号码数量
         numCounts.forEach(numCount => {
-          // 检查是否已存在相同记录（同一期、同一数量、同一模式）
-          const exists = currentHistory.some(item => 
-            item.expect === predictExpect && 
-            item.analyzeLimit === periodConfig.limit && 
-            item.numCount === numCount &&
-            item.mode === currentMode
-          );
-          
-          if(exists) {
-            return; // 已存在则跳过
-          }
-          
           // 根据当前模式选择不同的筛选策略
           let finalNums = [];
+          let actualMode = currentMode;
           
           if(currentMode === 'cold') {
             // ❄️ 冷号反弹模式
@@ -6091,6 +6146,7 @@ const Business = {
           } else if(currentMode === 'auto') {
             // 🤖 自动模式：智能判断使用热号还是冷号模式
             const modeDecision = Business.decideAutoMode(data);
+            actualMode = modeDecision; // 使用决策结果作为实际模式
             if(modeDecision === 'cold') {
               finalNums = Business.getColdReboundNumbers(data, numCount, fullNumZodiacMap);
             } else {
@@ -6103,6 +6159,31 @@ const Business = {
           
           // 排序
           finalNums.sort((a, b) => a - b);
+          
+          // 检查是否已存在相同记录（同一期、同一数量、同一模式）
+          const exists = currentHistory.some(item => 
+            item.expect === predictExpect && 
+            item.analyzeLimit === periodConfig.limit && 
+            item.numCount === numCount &&
+            item.mode === actualMode
+          );
+          
+          if(exists) {
+            return; // 已存在则跳过
+          }
+          
+          // 检查是否已存在相同的历史记录（根据号码、期数和模式判断）
+          const isDuplicate = currentHistory.some(item => 
+            item.numbers && 
+            item.numbers.length === numCount && 
+            item.numbers.every((n, i) => n === finalNums[i]) &&
+            item.analyzeLimit === periodConfig.limit &&
+            item.mode === actualMode
+          );
+          
+          if(isDuplicate) {
+            return; // 已存在相同记录，不添加
+          }
           
           // 创建历史记录项
           const historyItem = {
@@ -6119,7 +6200,7 @@ const Business = {
             drawResult: null,
             hitNumbers: [],
             hitCount: 0,
-            mode: currentMode // 使用当前选择的模式
+            mode: actualMode // 使用实际生效的模式（hot 或 cold）
           };
           
           // 添加到历史记录
@@ -6440,8 +6521,16 @@ const Business = {
         
         // 模式筛选
         let modeMatch = false;
-        if(modeFilter === 'all') modeMatch = true;
-        else if(modeFilter === itemMode) modeMatch = true;
+        if(modeFilter === 'all') {
+          // 全部模式：显示所有模式的数据
+          modeMatch = true;
+        } else if(modeFilter === 'auto') {
+          // 自动模式：显示所有模式的数据（因为自动模式最终会转换为热号或冷号）
+          modeMatch = true;
+        } else if(modeFilter === itemMode) {
+          // 特定模式：只显示对应模式的数据
+          modeMatch = true;
+        }
         
         return periodMatch && numMatch && modeMatch;
       });
@@ -7273,7 +7362,7 @@ const EventBinder = {
     // 13. 精选特码历史期数按钮
     const specialPeriodBtn = target.closest('.special-period-btn[data-period]');
     if(specialPeriodBtn){
-      Business.toggleButtonState(specialPeriodBtn);
+      Business.toggleRadioButtonGroup(specialPeriodBtn, '.special-period-btn');
       Business.saveSpecialHistoryFilter();
       Business.renderSpecialHistory();
       return;
@@ -7282,7 +7371,7 @@ const EventBinder = {
     // 14. 精选特码历史号码数量按钮
     const specialNumBtn = target.closest('.special-num-btn[data-num]');
     if(specialNumBtn){
-      Business.toggleButtonState(specialNumBtn);
+      Business.toggleRadioButtonGroup(specialNumBtn, '.special-num-btn');
       Business.saveSpecialHistoryFilter();
       Business.renderSpecialHistory();
       return;
