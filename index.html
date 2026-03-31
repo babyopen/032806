@@ -34,7 +34,7 @@
     <div class="top-card">
       <div class="top-title">
         <span>符合条件：<span id="resultCount" aria-live="polite">0</span> 个</span>
-        <span>v26.03.6</span>
+        <span>v26.05.01</span>
       </div>
     <div id="resultNums" class="top-nums" role="list"></div>
   </div>
@@ -442,7 +442,7 @@
       <div class="card-body">
         <div style="text-align:center; padding:20px 0;">
           <div style="font-size:18px; font-weight:600; margin-bottom:8px;">小摇筛选</div>
-          <div style="color:var(--sub-text); font-size:14px;">版本：V26.03.6</div>
+          <div style="color:var(--sub-text); font-size:14px;">版本：V26.05.01</div>
           <div style="color:var(--sub-text); font-size:12px; margin-top:16px;">仅供娱乐，非投注建议</div>
         </div>
       </div>
@@ -716,9 +716,9 @@
                 <div style="display:flex;gap:8px;align-items:center;">
                   <!-- 模式切换按钮组 -->
                   <div class="mode-switch-btns" style="display:flex;gap:4px;margin-right:8px;">
-                    <button class="btn-mini mode-btn ${state.analysis.specialMode === 'hot' ? 'active' : ''}" data-mode="hot" data-action="switchSpecialMode" title="🔥 热号模式">🔥</button>
-                    <button class="btn-mini mode-btn ${state.analysis.specialMode === 'cold' ? 'active' : ''}" data-mode="cold" data-action="switchSpecialMode" title="❄️ 冷号反弹">❄️</button>
-                    <button class="btn-mini mode-btn ${state.analysis.specialMode === 'auto' ? 'active' : ''}" data-mode="auto" data-action="switchSpecialMode" title="🤖 自动模式">🤖</button>
+                    <button class="btn-mini mode-btn active" data-mode="hot" data-action="switchSpecialMode" title="🔥 热号模式">🔥</button>
+                    <button class="btn-mini mode-btn" data-mode="cold" data-action="switchSpecialMode" title="❄️ 冷号反弹">❄️</button>
+                    <button class="btn-mini mode-btn" data-mode="auto" data-action="switchSpecialMode" title="🤖 自动模式">🤖</button>
                   </div>
                   <button class="btn-mini" data-action="copyZodiacNumbers" style="flex-shrink:0;">复制</button>
                   <button class="btn-mini" data-action="favoriteZodiacNumbers" style="flex-shrink:0;">收藏</button>
@@ -780,7 +780,7 @@
  * @enum {any}
  */
 const CONFIG = Object.freeze({
-  VERSION: '26.3.05.1',
+  VERSION: 'V26.05.01',
   DATA_VERSION: 1, // 数据版本号，用于后续数据迁移
   // API配置
   API: Object.freeze({
@@ -1194,9 +1194,9 @@ const StateManager = {
       showCount: 20,
       currentTab: 'history',
       autoRefreshTimer: null,
-      specialMode: 'hot', // 'hot' | 'cold' | 'auto'
+      specialMode: 'auto', // 'hot' | 'cold' | 'auto'
       autoModeDecision: {
-        lastDecision: 'hot',
+        lastDecision: 'auto',
         lastDecisionPeriod: 0,
         holdPeriods: 0
       }
@@ -3884,6 +3884,11 @@ const Business = {
     const zodiacFinalNum = document.getElementById('zodiacFinalNum');
     const mode = state.analysis.specialMode || 'hot';
     
+    // 同步模式按钮状态
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === mode);
+    });
+    
     if(!data || !data.sortedZodiacs || data.sortedZodiacs.length === 0) {
       if(zodiacFinalNum) {
         zodiacFinalNum.innerHTML = '✅ 精选特码：暂无数据';
@@ -3960,6 +3965,13 @@ const Business = {
       `;
     });
     ballHtml += '</div>';
+    
+    // 为自动模式添加子模式显示
+    if(mode === 'auto') {
+      const modeDecision = Business.decideAutoMode(data);
+      const subModeText = modeDecision === 'cold' ? '❄️ 冷号模式' : '🔥 热号模式';
+      ballHtml = `<div class="auto-mode-submode" style="text-align:center; margin-bottom:10px; font-size:14px; color:#666;">自动模式当前选择：${subModeText}</div>` + ballHtml;
+    }
 
     const zodiacFinalNumContent = document.getElementById('zodiacFinalNumContent');
     if(zodiacFinalNumContent) {
@@ -4049,19 +4061,28 @@ const Business = {
     const state = StateManager._state;
     const { historyData } = state.analysis;
     
+    // 安全检查：如果没有历史数据，返回空数组
+    if(!historyData || historyData.length === 0) {
+      console.log('[冷号模式] 无历史数据，返回空数组');
+      return [];
+    }
+    
     // 计算每个号码的遗漏期数
     const numMiss = {};
     for(let num = 1; num <= 49; num++) {
-      numMiss[num] = historyData.length; // 默认全部遗漏
+      numMiss[num] = historyData.length; // 默认全部遗漏（从未出现过）
     }
     
     historyData.forEach((item, idx) => {
-      if(item.te && numMiss[item.te] === historyData.length) {
-        numMiss[item.te] = idx;
+      const special = Business.getSpecial(item);
+      if(special.te) {
+        // 遗漏期数 = 当前期数 - 上次出现的期数
+        // idx 是从 0 开始的索引，0 表示最新一期，1 表示上一期，以此类推
+        numMiss[special.te] = idx;
       }
     });
 
-    // 筛选遗漏期数 >= 15 的号码（不足时降至 >= 10）
+    // 1. 筛选遗漏期数 >= 15 的号码（不足时降至 >= 10）
     let minMissThreshold = 15;
     let coldCandidates = [];
     
@@ -4105,7 +4126,7 @@ const Business = {
       recentHeadCount[head] = (recentHeadCount[head] || 0) + 1;
     });
 
-    // 计算反弹潜力分
+    // 2. 计算反弹潜力分
     const scoredCandidates = coldCandidates.map(({ num, miss }) => {
       const zod = fullNumZodiacMap.get(num);
       const tail = num % 10;
@@ -4130,11 +4151,22 @@ const Business = {
       
       const totalScore = missDepthScore + zodiacHotScore + tailHotScore + colorHotScore + headHotScore;
       
-      return { num, score: totalScore };
+      return { num, miss, score: totalScore, zod, tail };
     });
 
-    // 按反弹潜力分排序，取前N个
+    // 3. 按反弹潜力分排序，取前N个
     scoredCandidates.sort((a, b) => b.score - a.score);
+    
+    // 调试输出
+    console.log('[冷号模式] 冷号候选总数:', coldCandidates.length);
+    console.log('[冷号模式] 前10个高分冷号:', scoredCandidates.slice(0, 10).map(c => ({
+      num: c.num,
+      miss: c.miss,
+      score: c.score,
+      zod: c.zod,
+      tail: c.tail
+    })));
+    
     let finalNums = scoredCandidates.slice(0, targetCount).map(i => i.num);
     
     // 兜底机制：如果冷号候选不足，从遗漏期数最长的号码中补充
@@ -4146,17 +4178,31 @@ const Business = {
         .slice(0, remainingCount)
         .map(c => c.num);
       finalNums.push(...sortedByMiss);
+      console.log('[冷号模式] 从冷号候选补充:', sortedByMiss);
     }
     
-    // 如果还是不足，随机补充（兜底）
+    // 如果还是不足，从遗漏期数较长的号码中补充（兜底）
     if(finalNums.length < targetCount) {
-      for(let num = 1; num <= 49 && finalNums.length < targetCount; num++) {
+      const remainingCount = targetCount - finalNums.length;
+      // 获取所有未选中的号码，按遗漏期数排序
+      const remainingNums = [];
+      for(let num = 1; num <= 49; num++) {
         if(!finalNums.includes(num)) {
-          finalNums.push(num);
+          remainingNums.push({ num, miss: numMiss[num] || 0 });
         }
       }
+      // 按遗漏期数降序排序（优先选择遗漏期数长的）
+      remainingNums.sort((a, b) => b.miss - a.miss);
+      // 取前N个
+      const fillNums = remainingNums.slice(0, remainingCount).map(n => n.num);
+      finalNums.push(...fillNums);
+      console.log('[冷号模式] 从遗漏号码补充:', fillNums);
     }
     
+    // 按号码从小到大排序
+    finalNums.sort((a, b) => a - b);
+    
+    console.log('[冷号模式] 最终结果:', finalNums);
     return finalNums;
   },
 
@@ -4168,6 +4214,13 @@ const Business = {
   decideAutoMode: (data) => {
     const state = StateManager._state;
     const { historyData } = state.analysis;
+    
+    // 安全检查：如果没有历史数据，默认使用热号模式
+    if(!historyData || historyData.length < 10) {
+      console.log('[自动模式] 历史数据不足，默认使用热号模式');
+      return 'hot';
+    }
+    
     const decision = state.analysis.autoModeDecision || {
       lastDecision: 'hot',
       lastDecisionPeriod: 0,
@@ -4227,8 +4280,9 @@ const Business = {
     }
     
     historyData.forEach((item, idx) => {
-      if(item.te && numMiss[item.te] === historyData.length) {
-        numMiss[item.te] = idx;
+      const special = Business.getSpecial(item);
+      if(special.te) {
+        numMiss[special.te] = idx;
       }
     });
     
@@ -4346,7 +4400,8 @@ const Business = {
     
     // 简化版生肖预测分数计算
     const zodiacScores = {};
-    const maxMiss = Math.max(...Object.values(zodMiss));
+    const zodMissValues = Object.values(zodMiss);
+    const maxMiss = zodMissValues.length > 0 ? Math.max(...zodMissValues) : 0;
     
     CONFIG.ANALYSIS.ZODIAC_ALL.forEach(zod => {
       let score = 0;
@@ -5968,6 +6023,7 @@ const Business = {
     try {
       const state = StateManager._state;
       const historyData = state.analysis.historyData;
+      const currentMode = state.analysis.specialMode || 'hot';
       
       if(!historyData || historyData.length < 2) {
         return;
@@ -6012,89 +6068,38 @@ const Business = {
           return;
         }
         
-        // 锁定核心生肖池：使用生肖预测高分的前4个生肖
-        const coreZodiacs = data.sortedZodiacs 
-          ? data.sortedZodiacs.slice(0, 4).map(i => i[0])
-          : data.topZod.slice(0, 2).map(i => i[0]);
-        
-        // 锁定热门尾数TOP3
-        const hotTails = data.topTail.slice(0, 3).map(i => i.t);
-        
-        // 筛选候选号码
-        const candidateNums = [];
-        for(let num = 1; num <= 49; num++) {
-          const zod = fullNumZodiacMap.get(num);
-          const tail = num % 10;
-          if(coreZodiacs.includes(zod) && hotTails.includes(tail)) {
-            const miss = data.zodMiss[zod] || 0;
-            const count = data.zodCount[zod] || 0;
-            // 获取生肖预测分数作为额外权重
-            const zodScore = data.zodiacScores && data.zodiacScores[zod] ? data.zodiacScores[zod] : 0;
-            candidateNums.push({
-              num,
-              weight: count * 10 + (10 - miss) + zodScore * 2
-            });
-          }
-        }
-        
-        // 按权重排序
-        candidateNums.sort((a, b) => b.weight - a.weight);
-        
         // 遍历所有号码数量
         numCounts.forEach(numCount => {
-          // 检查是否已存在相同记录
+          // 检查是否已存在相同记录（同一期、同一数量、同一模式）
           const exists = currentHistory.some(item => 
             item.expect === predictExpect && 
             item.analyzeLimit === periodConfig.limit && 
-            item.numCount === numCount
+            item.numCount === numCount &&
+            item.mode === currentMode
           );
           
           if(exists) {
             return; // 已存在则跳过
           }
           
-          // 生成该数量的号码
-          let finalNums = candidateNums.slice(0, numCount).map(i => i.num);
+          // 根据当前模式选择不同的筛选策略
+          let finalNums = [];
           
-          // 兜底机制1：如果候选号码不够，扩大核心生肖池到前6个
-          if(finalNums.length < numCount) {
-            const expandedCoreZodiacs = data.sortedZodiacs 
-              ? data.sortedZodiacs.slice(0, 6).map(i => i[0])
-              : data.topZod.slice(0, 4).map(i => i[0]);
-            
-            for(let num = 1; num <= 49; num++) {
-              if(finalNums.includes(num)) continue;
-              const zod = fullNumZodiacMap.get(num);
-              const tail = num % 10;
-              if(expandedCoreZodiacs.includes(zod) && hotTails.includes(tail)) {
-                const miss = data.zodMiss[zod] || 0;
-                const count = data.zodCount[zod] || 0;
-                const zodScore = data.zodiacScores && data.zodiacScores[zod] ? data.zodiacScores[zod] : 0;
-                finalNums.push(num);
-                if(finalNums.length >= numCount) break;
-              }
+          if(currentMode === 'cold') {
+            // ❄️ 冷号反弹模式
+            finalNums = Business.getColdReboundNumbers(data, numCount, fullNumZodiacMap);
+          } else if(currentMode === 'auto') {
+            // 🤖 自动模式：智能判断使用热号还是冷号模式
+            const modeDecision = Business.decideAutoMode(data);
+            if(modeDecision === 'cold') {
+              finalNums = Business.getColdReboundNumbers(data, numCount, fullNumZodiacMap);
+            } else {
+              finalNums = Business.getHotNumbers(data, numCount, fullNumZodiacMap);
             }
+          } else {
+            // 🔥 热号模式（默认）
+            finalNums = Business.getHotNumbers(data, numCount, fullNumZodiacMap);
           }
-          
-          // 兜底机制2：如果还不够，从所有号码中补充
-          if(finalNums.length < numCount) {
-            const allHotNums = [...new Set(data.list.map(item => Business.getSpecial(item).te))]
-              .filter(num => !finalNums.includes(num));
-            const remainingCount = numCount - finalNums.length;
-            finalNums.push(...allHotNums.slice(0, remainingCount));
-          }
-          
-          // 兜底机制3：如果还不够，从1-49中随机补充
-          if(finalNums.length < numCount) {
-            for(let num = 1; num <= 49 && finalNums.length < numCount; num++) {
-              if(!finalNums.includes(num)) {
-                finalNums.push(num);
-              }
-            }
-          }
-          
-          // 确保数量正确
-          finalNums = finalNums.slice(0, numCount);
           
           // 排序
           finalNums.sort((a, b) => a - b);
@@ -6113,7 +6118,8 @@ const Business = {
             predictExpect: predictExpect,
             drawResult: null,
             hitNumbers: [],
-            hitCount: 0
+            hitCount: 0,
+            mode: currentMode // 使用当前选择的模式
           };
           
           // 添加到历史记录
