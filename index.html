@@ -6545,6 +6545,16 @@ const Business = {
         const currentMode = state.analysis.specialMode || 'hot';
         const isAutoMode = currentMode === 'auto';
         
+        // 获取当前自动模式的决策结果
+        let autoModeDecision = null;
+        if(isAutoMode) {
+          // 计算分析数据以获取自动模式决策
+          const data = Business.calcZodiacAnalysis(item.analyzeLimit);
+          if(data && data.sortedZodiacs && data.sortedZodiacs.length > 0) {
+            autoModeDecision = Business.decideAutoMode(data);
+          }
+        }
+        
         // 生成标题
         let titleText = '';
         if(item.expect) {
@@ -6556,8 +6566,8 @@ const Business = {
           titleText = periodText;
         }
         
-        // 当系统处于自动模式时，在对应模式文本后方显示自动模式图标
-        if(isAutoMode) {
+        // 当系统处于自动模式且当前记录的模式与自动模式决策结果匹配时，显示自动模式图标
+        if(isAutoMode && autoModeDecision === itemMode) {
           titleText += ` · ${numCount}个号 · ${modeEmoji} 🤖`;
         } else {
           titleText += ` · ${numCount}个号 · ${modeEmoji}`;
