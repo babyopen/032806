@@ -6089,7 +6089,6 @@ const Business = {
     try {
       const state = StateManager._state;
       const historyData = state.analysis.historyData;
-      const currentMode = state.analysis.specialMode || 'hot';
       
       if(!historyData || historyData.length < 2) {
         return;
@@ -6114,6 +6113,9 @@ const Business = {
       // 定义所有号码数量组合
       const numCounts = [5, 10, 15, 20];
       
+      // 定义需要保存的模式（只保存热号和冷号）
+      const modes = ['hot', 'cold'];
+      
       // 获取现有历史记录
       let currentHistory = [...state.specialHistory];
       let hasUpdates = false;
@@ -6134,78 +6136,71 @@ const Business = {
           return;
         }
         
-        // 遍历所有号码数量
-        numCounts.forEach(numCount => {
-          // 根据当前模式选择不同的筛选策略
-          let finalNums = [];
-          let actualMode = currentMode;
-          
-          if(currentMode === 'cold') {
-            // ❄️ 冷号反弹模式
-            finalNums = Business.getColdReboundNumbers(data, numCount, fullNumZodiacMap);
-          } else if(currentMode === 'auto') {
-            // 🤖 自动模式：智能判断使用热号还是冷号模式
-            const modeDecision = Business.decideAutoMode(data);
-            actualMode = modeDecision; // 使用决策结果作为实际模式
-            if(modeDecision === 'cold') {
+        // 遍历所有需要保存的模式（热号和冷号）
+        modes.forEach(mode => {
+          // 遍历所有号码数量
+          numCounts.forEach(numCount => {
+            // 根据模式选择不同的筛选策略
+            let finalNums = [];
+            
+            if(mode === 'cold') {
+              // ❄️ 冷号反弹模式
               finalNums = Business.getColdReboundNumbers(data, numCount, fullNumZodiacMap);
             } else {
+              // 🔥 热号模式
               finalNums = Business.getHotNumbers(data, numCount, fullNumZodiacMap);
             }
-          } else {
-            // 🔥 热号模式（默认）
-            finalNums = Business.getHotNumbers(data, numCount, fullNumZodiacMap);
-          }
-          
-          // 排序
-          finalNums.sort((a, b) => a - b);
-          
-          // 检查是否已存在相同记录（同一期、同一数量、同一模式）
-          const exists = currentHistory.some(item => 
-            item.expect === predictExpect && 
-            item.analyzeLimit === periodConfig.limit && 
-            item.numCount === numCount &&
-            item.mode === actualMode
-          );
-          
-          if(exists) {
-            return; // 已存在则跳过
-          }
-          
-          // 检查是否已存在相同的历史记录（根据号码、期数和模式判断）
-          const isDuplicate = currentHistory.some(item => 
-            item.numbers && 
-            item.numbers.length === numCount && 
-            item.numbers.every((n, i) => n === finalNums[i]) &&
-            item.analyzeLimit === periodConfig.limit &&
-            item.mode === actualMode
-          );
-          
-          if(isDuplicate) {
-            return; // 已存在相同记录，不添加
-          }
-          
-          // 创建历史记录项
-          const historyItem = {
-            id: Date.now() + Math.random(),
-            timestamp: Date.now(),
-            numbers: finalNums,
-            numCount: numCount,
-            analyzeLimit: periodConfig.limit,
-            selectedPeriod: periodConfig.limit,
-            selectedPeriodText: periodConfig.text,
-            latestExpect: latestExpect,
-            expect: predictExpect,
-            predictExpect: predictExpect,
-            drawResult: null,
-            hitNumbers: [],
-            hitCount: 0,
-            mode: actualMode // 使用实际生效的模式（hot 或 cold）
-          };
-          
-          // 添加到历史记录
-          currentHistory.unshift(historyItem);
-          hasUpdates = true;
+            
+            // 排序
+            finalNums.sort((a, b) => a - b);
+            
+            // 检查是否已存在相同记录（同一期、同一数量、同一模式）
+            const exists = currentHistory.some(item => 
+              item.expect === predictExpect && 
+              item.analyzeLimit === periodConfig.limit && 
+              item.numCount === numCount &&
+              item.mode === mode
+            );
+            
+            if(exists) {
+              return; // 已存在则跳过
+            }
+            
+            // 检查是否已存在相同的历史记录（根据号码、期数和模式判断）
+            const isDuplicate = currentHistory.some(item => 
+              item.numbers && 
+              item.numbers.length === numCount && 
+              item.numbers.every((n, i) => n === finalNums[i]) &&
+              item.analyzeLimit === periodConfig.limit &&
+              item.mode === mode
+            );
+            
+            if(isDuplicate) {
+              return; // 已存在相同记录，不添加
+            }
+            
+            // 创建历史记录项
+            const historyItem = {
+              id: Date.now() + Math.random(),
+              timestamp: Date.now(),
+              numbers: finalNums,
+              numCount: numCount,
+              analyzeLimit: periodConfig.limit,
+              selectedPeriod: periodConfig.limit,
+              selectedPeriodText: periodConfig.text,
+              latestExpect: latestExpect,
+              expect: predictExpect,
+              predictExpect: predictExpect,
+              drawResult: null,
+              hitNumbers: [],
+              hitCount: 0,
+              mode: mode // 直接使用热号或冷号模式
+            };
+            
+            // 添加到历史记录
+            currentHistory.unshift(historyItem);
+            hasUpdates = true;
+          });
         });
       });
       
