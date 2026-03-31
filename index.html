@@ -5802,9 +5802,16 @@ const Business = {
     const buttons = document.querySelectorAll(selector);
     
     // 对于单选按钮组，只取第一个激活值
+    // 但如果是全选操作（activeValues包含所有可能的值），则允许多选
     let finalActiveValues = activeValues;
     if (selector === '.special-period-btn' || selector === '.special-num-btn') {
-      if (activeValues && activeValues.length > 0) {
+      // 检查是否是全选操作
+      const allPeriodValues = ['10', '20', '30', 'all'];
+      const allNumValues = ['5', '10', '15', '20'];
+      const isFullSelect = (selector === '.special-period-btn' && JSON.stringify(activeValues) === JSON.stringify(allPeriodValues)) ||
+                          (selector === '.special-num-btn' && JSON.stringify(activeValues) === JSON.stringify(allNumValues));
+      
+      if (!isFullSelect && activeValues && activeValues.length > 0) {
         finalActiveValues = [activeValues[0]];
       }
     }
