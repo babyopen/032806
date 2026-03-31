@@ -397,7 +397,6 @@
             <button class="btn-mini mode-btn special-history-mode-btn active" data-mode="all" data-action="switchSpecialHistoryMode" title="全部">全</button>
             <button class="btn-mini mode-btn special-history-mode-btn" data-mode="hot" data-action="switchSpecialHistoryMode" title="🔥 热号模式">🔥</button>
             <button class="btn-mini mode-btn special-history-mode-btn" data-mode="cold" data-action="switchSpecialHistoryMode" title="❄️ 冷号反弹">❄️</button>
-            <button class="btn-mini mode-btn special-history-mode-btn" data-mode="auto" data-action="switchSpecialHistoryMode" title="🤖 自动模式">🤖</button>
           </div>
           <button class="btn-mini" data-action="toggleSpecialFiltersPanel" style="font-size:11px;">选择</button>
           <button class="btn-mini red" data-action="clearSpecialHistory" aria-label="清空精选特码历史" style="font-size:11px;">清空</button>
@@ -718,7 +717,6 @@
                   <div class="mode-switch-btns" style="display:flex;gap:4px;margin-right:8px;">
                     <button class="btn-mini mode-btn active" data-mode="hot" data-action="switchSpecialMode" title="🔥 热号模式">🔥</button>
                     <button class="btn-mini mode-btn" data-mode="cold" data-action="switchSpecialMode" title="❄️ 冷号反弹">❄️</button>
-                    <button class="btn-mini mode-btn" data-mode="auto" data-action="switchSpecialMode" title="🤖 自动模式">🤖</button>
                   </div>
                   <button class="btn-mini" data-action="copyZodiacNumbers" style="flex-shrink:0;">复制</button>
                   <button class="btn-mini" data-action="favoriteZodiacNumbers" style="flex-shrink:0;">收藏</button>
@@ -1194,17 +1192,12 @@ const StateManager = {
       showCount: 20,
       currentTab: 'history',
       autoRefreshTimer: null,
-      specialMode: 'auto', // 'hot' | 'cold' | 'auto'
-      autoModeDecision: {
-        lastDecision: 'auto',
-        lastDecisionPeriod: 0,
-        holdPeriods: 0
-      }
+      specialMode: 'hot' // 'hot' | 'cold'
     },
     // 精选特码历史状态
     specialHistory: [],
     specialHistoryExpanded: false,
-    specialHistoryModeFilter: 'all' // 'all' | 'hot' | 'cold' | 'auto'
+    specialHistoryModeFilter: 'all' // 'all' | 'hot' | 'cold'
   },
 
   /**
@@ -3931,16 +3924,6 @@ const Business = {
       console.log('[冷号模式] 开始计算...');
       finalNums = Business.getColdReboundNumbers(data, targetCount, fullNumZodiacMap);
       console.log('[冷号模式] 结果:', finalNums);
-    } else if(mode === 'auto') {
-      // 🤖 自动模式：智能判断使用热号还是冷号模式
-      console.log('[自动模式] 开始决策...');
-      const modeDecision = Business.decideAutoMode(data);
-      console.log('[自动模式] 决策结果:', modeDecision);
-      if(modeDecision === 'cold') {
-        finalNums = Business.getColdReboundNumbers(data, targetCount, fullNumZodiacMap);
-      } else {
-        finalNums = Business.getHotNumbers(data, targetCount, fullNumZodiacMap);
-      }
     } else {
       // 🔥 热号模式（默认）
       finalNums = Business.getHotNumbers(data, targetCount, fullNumZodiacMap);
@@ -3965,13 +3948,6 @@ const Business = {
       `;
     });
     ballHtml += '</div>';
-    
-    // 为自动模式添加子模式显示
-    if(mode === 'auto') {
-      const modeDecision = Business.decideAutoMode(data);
-      const subModeText = modeDecision === 'cold' ? '❄️ 冷号模式' : '🔥 热号模式';
-      ballHtml = `<div class="auto-mode-submode" style="text-align:center; margin-bottom:10px; font-size:14px; color:#666;">自动模式当前选择：${subModeText}</div>` + ballHtml;
-    }
 
     const zodiacFinalNumContent = document.getElementById('zodiacFinalNumContent');
     if(zodiacFinalNumContent) {
@@ -4204,155 +4180,6 @@ const Business = {
     
     console.log('[冷号模式] 最终结果:', finalNums);
     return finalNums;
-  },
-
-  /**
-   * 🤖 自动模式：智能判断使用哪种模式
-   * @param {Object} data - 分析数据
-   * @returns {string} 'hot' 或 'cold'
-   */
-  decideAutoMode: (data) => {
-    const state = StateManager._state;
-    const { historyData } = state.analysis;
-    
-    // 安全检查：如果没有历史数据，默认使用热号模式
-    if(!historyData || historyData.length < 10) {
-      console.log('[自动模式] 历史数据不足，默认使用热号模式');
-      return 'hot';
-    }
-    
-    const decision = state.analysis.autoModeDecision || {
-      lastDecision: 'hot',
-      lastDecisionPeriod: 0,
-      holdPeriods: 0
-    };
-    
-    if(!historyData || historyData.length < 10) {
-      return 'hot'; // 数据不足时默认使用热号模式
-    }
-
-    const currentPeriod = historyData.length;
-    
-    // 第四步：滞后保护机制
-    // 检查是否需要保持当前模式
-    if(decision.lastDecisionPeriod > 0 && (currentPeriod - decision.lastDecisionPeriod) < decision.holdPeriods) {
-      return decision.lastDecision;
-    }
-    
-    // 每5期重新计算一次走势判断
-    if(decision.lastDecisionPeriod > 0 && (currentPeriod - decision.lastDecisionPeriod) < 5) {
-      return decision.lastDecision;
-    }
-
-    // 第一步：计算热号延续度
-    // 热号延续度 = 最近5期开奖号码中，属于"当期热门生肖池"的比例
-    const recent5 = historyData.slice(0, 5);
-    let hotHitCount = 0;
-    let totalCount = 0;
-    
-    recent5.forEach((item, periodIdx) => {
-      if(!item.te) return;
-      totalCount++;
-      
-      // 获取该期开奖号码的生肖
-      const zod = DataQuery._getZodiacByNum(item.te);
-      if(!zod) return;
-      
-      // 计算该期对应的"热门生肖池"（前6高分生肖）
-      // 使用除了该期之外的数据来计算
-      const dataForThisPeriod = Business.calcZodiacAnalysisForPeriod(periodIdx + 1);
-      if(dataForThisPeriod && dataForThisPeriod.sortedZodiacs) {
-        const hotZodiacPool = dataForThisPeriod.sortedZodiacs.slice(0, 6).map(i => i[0]);
-        if(hotZodiacPool.includes(zod)) {
-          hotHitCount++;
-        }
-      }
-    });
-    
-    const hotContinuation = totalCount > 0 ? hotHitCount / totalCount : 0;
-    
-    // 第二步：计算冷号回补度
-    // 冷号回补度 = 最近5期开奖号码中，属于"冷号池"的比例
-    // 定义冷号池：遗漏 ≥ 15 期的号码
-    const numMiss = {};
-    for(let num = 1; num <= 49; num++) {
-      numMiss[num] = historyData.length; // 默认全部遗漏
-    }
-    
-    historyData.forEach((item, idx) => {
-      const special = Business.getSpecial(item);
-      if(special.te) {
-        numMiss[special.te] = idx;
-      }
-    });
-    
-    const coldPool = [];
-    for(let num = 1; num <= 49; num++) {
-      if(numMiss[num] >= 15) {
-        coldPool.push(num);
-      }
-    }
-    
-    // 统计最近5期开奖号码中，有多少个属于冷号池
-    let coldHitCount = 0;
-    recent5.forEach(item => {
-      if(!item.te) return;
-      if(coldPool.includes(item.te)) {
-        coldHitCount++;
-      }
-    });
-    
-    const coldRebound = totalCount > 0 ? coldHitCount / totalCount : 0;
-    
-    // 第三步：走势方向判断
-    let newDecision = 'hot';
-    
-    // 热号延续度 ≥ 60% → 热号模式（热号强势延续）
-    if(hotContinuation >= 0.6) {
-      newDecision = 'hot';
-    }
-    // 热号延续度 40%-60% 且 冷号回补度 ≥ 40% → 冷号反弹模式
-    else if(hotContinuation >= 0.4 && hotContinuation < 0.6 && coldRebound >= 0.4) {
-      newDecision = 'cold';
-    }
-    // 热号延续度 40%-60% 且 冷号回补度 < 40% → 热号模式（走势不明，优先追热）
-    else if(hotContinuation >= 0.4 && hotContinuation < 0.6 && coldRebound < 0.4) {
-      newDecision = 'hot';
-    }
-    // 热号延续度 < 40% 且 冷号回补度 ≥ 40% → 冷号反弹模式
-    else if(hotContinuation < 0.4 && coldRebound >= 0.4) {
-      newDecision = 'cold';
-    }
-    // 热号延续度 < 40% 且 冷号回补度 < 20% → 热号模式（双冷，仍然优先追热）
-    else if(hotContinuation < 0.4 && coldRebound < 0.2) {
-      newDecision = 'hot';
-    }
-    // 默认使用热号模式
-    else {
-      newDecision = 'hot';
-    }
-    
-    // 第四步：滞后保护机制
-    // 模式切换后，至少保持3期不变
-    let holdPeriods = 0;
-    if(newDecision !== decision.lastDecision) {
-      holdPeriods = 3;
-    }
-    
-    // 更新决策状态
-    const newAutoModeDecision = {
-      lastDecision: newDecision,
-      lastDecisionPeriod: currentPeriod,
-      holdPeriods: holdPeriods
-    };
-    
-    const newAnalysis = {
-      ...state.analysis,
-      autoModeDecision: newAutoModeDecision
-    };
-    StateManager.setState({ analysis: newAnalysis }, false);
-    
-    return newDecision;
   },
 
   /**
@@ -6335,10 +6162,10 @@ const Business = {
 
   /**
    * 切换精选特码模式
-   * @param {string} mode - 模式：'hot' | 'cold' | 'auto'
+   * @param {string} mode - 模式：'hot' | 'cold'
    */
   switchSpecialMode: (mode) => {
-    if(!['hot', 'cold', 'auto'].includes(mode)) return;
+    if(!['hot', 'cold'].includes(mode)) return;
     
     const state = StateManager._state;
     const currentMode = state.analysis.specialMode || 'hot';
@@ -6361,16 +6188,16 @@ const Business = {
     Business.renderZodiacAnalysis();
     
     // 显示提示
-    const modeText = mode === 'hot' ? '🔥 热号模式' : mode === 'cold' ? '❄️ 冷号反弹' : '🤖 自动模式';
+    const modeText = mode === 'hot' ? '🔥 热号模式' : '❄️ 冷号反弹';
     Toast.show(`已切换到${modeText}`);
   },
 
   /**
    * 切换精选特码历史模式筛选
-   * @param {string} mode - 模式：'all' | 'hot' | 'cold' | 'auto'
+   * @param {string} mode - 模式：'all' | 'hot' | 'cold'
    */
   switchSpecialHistoryMode: (mode) => {
-    if(!['all', 'hot', 'cold', 'auto'].includes(mode)) return;
+    if(!['all', 'hot', 'cold'].includes(mode)) return;
     
     const state = StateManager._state;
     const currentMode = state.specialHistoryModeFilter || 'all';
@@ -6389,7 +6216,7 @@ const Business = {
     Business.renderSpecialHistory();
     
     // 显示提示
-    const modeText = mode === 'all' ? '全部' : mode === 'hot' ? '🔥 热号模式' : mode === 'cold' ? '❄️ 冷号反弹' : '🤖 自动模式';
+    const modeText = mode === 'all' ? '全部' : mode === 'hot' ? '🔥 热号模式' : '❄️ 冷号反弹';
     Toast.show(`已筛选：${modeText}`);
   },
 
@@ -6519,9 +6346,6 @@ const Business = {
         if(modeFilter === 'all') {
           // 全部模式：显示所有模式的数据
           modeMatch = true;
-        } else if(modeFilter === 'auto') {
-          // 自动模式：显示所有模式的数据（因为自动模式最终会转换为热号或冷号）
-          modeMatch = true;
         } else if(modeFilter === itemMode) {
           // 特定模式：只显示对应模式的数据
           modeMatch = true;
@@ -6540,7 +6364,7 @@ const Business = {
         const itemMode = item.mode || 'hot'; // 获取模式，默认为热号模式
         
         // 生成模式标签
-        const modeEmoji = itemMode === 'hot' ? '🔥' : itemMode === 'cold' ? '❄️' : itemMode === 'auto' ? '🤖' : '🔥';
+        const modeEmoji = itemMode === 'hot' ? '🔥' : '❄️';
         
         // 生成标题
         let titleText = '';
