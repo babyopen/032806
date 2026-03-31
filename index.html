@@ -3842,7 +3842,11 @@ const Business = {
           `).join('');
           
           selectedHtml += `
-            <div class="selected-zodiac-item">
+            <div class="selected-zodiac-item" 
+                 data-zodiac="${zod}" 
+                 role="button" 
+                 tabindex="0"
+                 aria-label="查看${zod}的详细信息">
               <div class="zodiac-name">${zod}</div>
               <div class="zodiac-periods">
                 ${periodTags}
@@ -3851,6 +3855,24 @@ const Business = {
           `;
         });
         selectedZodiacsGrid.innerHTML = selectedHtml;
+        
+        // 绑定点击事件
+        selectedZodiacsGrid.querySelectorAll('.selected-zodiac-item').forEach(item => {
+          const zodiac = item.getAttribute('data-zodiac');
+          
+          // 点击事件
+          item.addEventListener('click', () => {
+            Business.showZodiacDetailModal(zodiac, selectedZodiacsMap.get(zodiac));
+          });
+          
+          // 键盘事件（Enter/Space）
+          item.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              Business.showZodiacDetailModal(zodiac, selectedZodiacsMap.get(zodiac));
+            }
+          });
+        });
       } else {
         selectedZodiacsGrid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: var(--sub-text);">暂无精选生肖数据</div>';
       }
@@ -7556,6 +7578,109 @@ const EventBinder = {
     else if(deltaX < 0 && startX > screenWidth - EventBinder._edgeSwipeWidth && currentIndex < tabs.length - 1) {
       Business.switchAnalysisTab(tabs[currentIndex + 1]);
     }
+  },
+
+  /**
+   * 显示生肖详情模态框
+   * @param {string} zodiac - 生肖名称
+   * @param {Array} periods - 期数数组
+   */
+  showZodiacDetailModal: (zodiac, periods) => {
+    // 获取生肖在各期数的详细数据
+    const zodiacData = {};
+    periods.forEach(period => {
+      const data = Business.calcZodiacAnalysis(period);
+      if(data && data.sortedZodiacs) {
+        const zodiacInfo = data.sortedZodiacs.find(([z]) => z === zodiac);
+        if(zodiacInfo) {
+          zodiacData[period] = {
+            score: zodiacInfo[1],
+            rank: data.sortedZodiacs.findIndex(([z]) => z === zodiac) + 1,
+            details: data.zodiacDetails ? data.zodiacDetails[zodiac] : null,
+            count: data.zodCount ? data.zodCount[zodiac] : 0,
+            miss: data.zodMiss ? data.zodMiss[zodiac] : 0
+          };
+        }
+      }
+    });
+    
+    // 构建模态框内容
+    let modalContent = `
+      <div class="zodiac-detail-modal" role="dialog" aria-modal="true" aria-labelledby="zodiac-detail-title">
+        <div class="zodiac-detail-header">
+          <h3 id="zodiac-detail-title" class="zodiac-detail-title">${zodiac} - 详细分析</h3>
+          <button class="zodiac-detail-close" aria-label="关闭详情" onclick="this.closest('.zodiac-detail-modal').remove()">&times;</button>
+        </div>
+        <div class="zodiac-detail-content">
+    `;
+    
+    // 按期数排序显示
+    periods.sort((a, b) => a - b).forEach(period => {
+      const data = zodiacData[period];
+      if(data) {
+        modalContent += `
+          <div class="zodiac-detail-period">
+            <div class="zodiac-detail-period-header">
+              <span class="zodiac-detail-period-name">最近${period}期</span>
+              <span class="zodiac-detail-rank">排名: #${data.rank}</span>
+            </div>
+            <div class="zodiac-detail-stats">
+              <div class="zodiac-detail-stat">
+                <span class="zodiac-detail-stat-label">预测分数</span>
+                <span class="zodiac-detail-stat-value">${data.score}分</span>
+              </div>
+              <div class="zodiac-detail-stat">
+                <span class="zodiac-detail-stat-label">出现次数</span>
+                <span class="zodiac-detail-stat-value">${data.count}次</span>
+              </div>
+              <div class="zodiac-detail-stat">
+                <span class="zodiac-detail-stat-label">遗漏期数</span>
+                <span class="zodiac-detail-stat-value">${data.miss}期</span>
+              </div>
+            </div>
+            ${data.details ? `
+              <div class="zodiac-detail-tags">
+                ${data.details.hotStatus ? `<span class="zodiac-detail-tag hot">${data.details.hotStatus}</span>` : ''}
+                ${data.details.coldStatus ? `<span class="zodiac-detail-tag cold">${data.details.coldStatus}</span>` : ''}
+                ${data.details.patternMatch ? `<span class="zodiac-detail-tag pattern">${data.details.patternMatch}</span>` : ''}
+                ${data.details.intervalMatch ? `<span class="zodiac-detail-tag interval">${data.details.intervalMatch}</span>` : ''}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    });
+    
+    modalContent += `
+        </div>
+      </div>
+    `;
+    
+    // 创建模态框容器
+    const modalContainer = document.createElement('div');
+    modalContainer.className = 'zodiac-detail-modal-overlay';
+    modalContainer.innerHTML = modalContent;
+    document.body.appendChild(modalContainer);
+    
+    // 点击遮罩层关闭
+    modalContainer.addEventListener('click', (e) => {
+      if(e.target === modalContainer) {
+        modalContainer.remove();
+      }
+    });
+    
+    // ESC键关闭
+    const escHandler = (e) => {
+      if(e.key === 'Escape') {
+        modalContainer.remove();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+    
+    // 聚焦到关闭按钮
+    const closeBtn = modalContainer.querySelector('.zodiac-detail-close');
+    if(closeBtn) closeBtn.focus();
   }
 };
 

@@ -1711,6 +1711,215 @@ input[type="checkbox"]{
   background: rgba(0,0,0,0.1);
 }
 
+/* 生肖详情模态框 */
+.zodiac-detail-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.zodiac-detail-modal {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.zodiac-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+}
+
+.zodiac-detail-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.zodiac-detail-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.zodiac-detail-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.zodiac-detail-close:focus {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.zodiac-detail-content {
+  padding: 16px 20px;
+  overflow-y: auto;
+  max-height: calc(80vh - 60px);
+}
+
+.zodiac-detail-period {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.zodiac-detail-period:last-child {
+  margin-bottom: 0;
+}
+
+.zodiac-detail-period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.zodiac-detail-period-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.zodiac-detail-rank {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  background: rgba(19, 166, 98, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.zodiac-detail-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.zodiac-detail-stat {
+  text-align: center;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.zodiac-detail-stat-label {
+  display: block;
+  font-size: 10px;
+  color: var(--sub-text);
+  margin-bottom: 4px;
+}
+
+.zodiac-detail-stat-value {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.zodiac-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.zodiac-detail-tag {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.zodiac-detail-tag.hot {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+}
+
+.zodiac-detail-tag.cold {
+  background: rgba(77, 171, 247, 0.2);
+  color: #4dabf7;
+}
+
+.zodiac-detail-tag.pattern {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.zodiac-detail-tag.interval {
+  background: rgba(156, 136, 255, 0.2);
+  color: #9c88ff;
+}
+
+@media (max-width: 480px) {
+  .zodiac-detail-modal-overlay {
+    padding: 16px;
+  }
+  
+  .zodiac-detail-modal {
+    max-height: 85vh;
+  }
+  
+  .zodiac-detail-content {
+    max-height: calc(85vh - 60px);
+  }
+  
+  .zodiac-detail-stats {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .zodiac-detail-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+  }
+  
+  .zodiac-detail-stat-label {
+    margin-bottom: 0;
+  }
+}
+
 @media (max-width: 480px) {
   .selected-zodiacs-grid {
     grid-template-columns: repeat(4, 1fr);
